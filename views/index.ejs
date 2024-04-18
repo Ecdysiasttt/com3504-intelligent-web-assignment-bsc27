@@ -14,12 +14,15 @@
         <p>Height: <%= plant.height %> </p>
         <p>Spread: <%= plant.spread %> </p>
         <p>Flowers: <%= plant.flowers %> </p>
+        <% if (plant.flowers) { %>
+            <p>Flower colour: <%= plant.flower_colour %></p>
+        <% } %>
         <p>Leaves: <%= plant.leaves %> </p>
         <p>Fruit: <%= plant.fruit %> </p>
         <p>Seeds: <%= plant.seeds %> </p>
         <p>Sun coverage: <%= plant.sun %> </p>
         <p>Identification: <%= plant.identification %> </p>
-        <p>DBPedia link: <%= plant.dbpedia %> </p>
+        <p>DBPedia link: <a href="<%= plant.dbpedia %>" target="_blank"><%= plant.dbpedia %></a> </p>
         <img src="<%= plant.photo %>" width="200" height="200">
         <p>Spotted by: <%= plant.uname %> </p>
       <% });%>
