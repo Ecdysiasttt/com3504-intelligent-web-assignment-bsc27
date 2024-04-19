@@ -19,13 +19,19 @@ var storage = multer.diskStorage({
 let upload = multer( { storage: storage });
 
 router.get('/add', function(req, res, next) {
-  res.render('add', { title: 'Add new plant sighting' });
+  res.render('add', {
+    title: 'Add new plant sighting',
+    site_name: 'Plantpedia'
+  });
 });
 
 /* POST plant add form */
 router.post('/add', upload.single('photo'), function(req, res, next) {
   let userData = req.body;
   let filePath = req.file.path;
+  console.log(userData.dateTime);
+  let date = plants.formatDate(userData.dateTime.toString());
+  let time = plants.formatTime(userData.dateTime.toString());
 
   // set checkboxes to boolean before storing in db
   userData.flowers = (userData.flowers === "on");
@@ -33,7 +39,7 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   userData.fruit = (userData.fruit === "on");
   userData.seeds = (userData.seeds === "on");
 
-  let result = plants.create(userData, filePath);
+  let result = plants.create(userData, filePath, date, time);
   console.log(result);
 
   res.redirect('/');

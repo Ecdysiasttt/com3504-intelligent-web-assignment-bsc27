@@ -2,10 +2,11 @@
 const plantModel = require('../models/plants');
 
 // function to create new plant
-exports.create = function (userData, filePath) {
+exports.create = function (userData, filePath, date, time) {
   // create a new plant instance using the provided user data
   let plant = new plantModel ({
-    date_time: userData.date_time,
+    date: date,
+    time: time,
     height: userData.height,
     spread: userData.spread,
     flowers: userData.flowers,
@@ -52,3 +53,18 @@ exports.getAll = function () {
   });
 };
 
+exports.formatDate = function(datetime) {
+  const date = datetime.split("T")[0];
+
+  // sort date from YYYY-MM-DD to DD/MM/YYYY
+  const splitDate = date.split("-");
+  var year = splitDate[0];
+  var month = splitDate[1];
+  var day = splitDate[2];
+
+  return day + "/" + month + "/" + year;
+}
+
+exports.formatTime = function(datetime) {
+  return datetime.split("T")[1];
+}

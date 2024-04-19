@@ -6,7 +6,8 @@ let Schema = mongoose.Schema;
 // define the schema for the student model
 let PlantSchema = new Schema(
   {
-    // date & time      string
+    // date             string
+    // time             string
     // height           int
     // spread           int
     // flowers          bool
@@ -22,7 +23,8 @@ let PlantSchema = new Schema(
     // uname            string
 
     // define the fields with correct types
-    date_time: {type: String, required: true, max: 100},
+    date: {type: String, required: true, max: 100},
+    time: {type: String, required: true, max: 100},
     height: {type: Number, required: true},
     spread: {type: Number, required: true},
     flowers: {type: Boolean},

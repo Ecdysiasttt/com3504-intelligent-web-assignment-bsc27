@@ -8,8 +8,12 @@ router.get('/', function(req, res, next) {
 
   result.then(plants => {
     let data = JSON.parse(plants);
-    console.log(data.length);
-    res.render('index', { title: 'View all plants', data: data});
+    console.log(data.length + " plants in database");
+    res.render('index', {
+      title: 'Home',
+      site_name: 'Plantpedia',
+      data: data
+    });
   });
 });
 

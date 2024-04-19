@@ -1,129 +1,162 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-<h1><%= title %></h1>
-<p>Welcome to <%= title %></p>
-<form action="/plants/add" method="post" enctype="multipart/form-data">
-    <label for="date_time">Spotted on:</label>
-    <input type="datetime-local" id="date_time" name="date_time" required>
-    <br>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%= title %> | <%= site_name %> </title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/vesper-icons@5.11.2/css/vesper-icons.min.css" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/7f6de5401f.js" crossorigin="anonymous"></script>
+    </head>
 
-    <!--      commenting out for now, unsure on implementation -->
-    <!--      <label for="loc">Location</label>-->
-    <!--      <input>-->
-    <!--      <br>-->
+    <body class="p-3">
+        <header class="d-flex justify-content-between align-items-center border-bottom border-dark mb-4">
+            <h1><a href="/" class="text-reset text-decoration-none"><%= site_name %></a></h1>
+            <a href="/plants/add" class="text-reset text-decoration-none btn btn-outline-dark">Add plant sighting</a>
+        </header>
 
-    <label for="height">Plant height:</label>
-    <input type="number" id="height" name="height" required>
-    <br>
+        <main>
+            <h4><%= title %></h4>
+            <form action="/plants/add" method="post" enctype="multipart/form-data">
+                <hr>
+                <!--      plant information -->
+                <h6 class="mb-3">Sighting details:</h6>
 
-    <label for="spread">Plant spread:</label>
-    <input type="number" id="spread" name="spread" required>
-    <br>
+                <div class="form-group">
+                    <label for="uname">Username:</label>
+                    <input type="text" class="form-control" id ="uname" name="uname" placeholder="Username" required>
+                </div>
 
-    <!--      plant characteristics -->
-    <input type="checkbox" id="flowers" name="flowers">
-    <label for="flowers">Flowers</label>
-    <br>
+                <div class="form-group">
+                    <label for="date_time">Spotted on:</label>
+                    <input type="datetime-local" class="form-control" id="date_time" name="dateTime" required>
+                </div>
 
-    <div id="flower-colour-div" style="display: none;">
-        <label for="flower_colour" id="flower-colour-label">Colour:</label>
-        <input type="text" id ="flower_colour" name="flower_colour">
-        <br>
-    </div>
+                <!--      commenting out for now, unsure on implementation -->
+                <!--      <label for="loc">Location</label>-->
+                <!--      <input>-->
+                <!--      <br>-->
 
-    <input type="checkbox" id="leaves" name="leaves">
-    <label for="leaves">Leaves</label>
-    <br>
+                <div class="form-group">
+                    <label for="height">Plant size:</label>
+                    <div class="d-flex">
+                        <input type="number" class="form-control" id="height" name="height" placeholder="Height" required>
+                        <input type="number" class="form-control ml-3" id="spread" name="spread" placeholder="Spread" required>
+                    </div>
+                </div>
 
-    <input type="checkbox" id="fruit" name="fruit">
-    <label for="fruit">Fruit</label>
-    <br>
+                <div class="form-group">
+                    <label for="photo">Photo:</label>
+                    <input type="file" class="form-control-file" id="photo" name="photo" accept="image/*" required>
+                </div>
 
-    <input type="checkbox" id="seeds" name="seeds">
-    <label for="seeds">Seeds</label>
-    <br>
+                <hr>
 
-    <div>
-        <p>Sun exposure:</p>
+                <!--      plant characteristics -->
+                <h6 class="mb-3">Plant Characteristics:</h6>
 
-        <div>
-            <input type="radio" id="full-sun" name="sun" value="full" checked required>
-            <label for="full-sun">Full sun</label>
-        </div>
+                <div>
+                    <div class="form-check d-flex">
+                        <div>
+                            <input type="checkbox" id="flowers" name="flowers">
+                            <label for="flowers">Flowers</label>
+                        </div>
 
-        <div>
-            <input type="radio" id="partial-sun" name="sun" value="partial">
-            <label for="partial-sun">Partial sun</label>
-        </div>
+                        <div id="flower-colour-div" class="form-group pl-3" style="display: none;">
+                            <input type="text" class="form-control form-control-sm" id ="flower_colour" name="flower_colour" placeholder="Flower colour">
+                        </div>
+                    </div>
 
-        <div>
-            <input type="radio" id="full-shade" name="sun" value="none">
-            <label for="full-shade">Full shade</label>
-        </div>
-    </div>
-    <br>
+                    <div class="form-check">
+                        <input type="checkbox" id="leaves" name="leaves">
+                        <label for="leaves">Leaves</label>
+                    </div>
 
-    <!--      identification -->
-    <label for="name">Plant name:</label>
-    <input type="text" id ="name" name="name" required>
-    <br>
+                    <div class="form-check">
+                        <input type="checkbox" id="fruit" name="fruit">
+                        <label for="fruit">Fruit</label>
+                    </div>
 
-    <div>
-        <p>Identification status:</p>
+                    <div class="form-check">
+                        <input type="checkbox" id="seeds" name="seeds">
+                        <label for="seeds">Seeds</label>
+                    </div>
+                </div>
 
-        <div>
-            <input type="radio" id="complete" name="identification" value="complete" checked required>
-            <label for="complete">Completed</label>
-        </div>
+                <div class="form-group">
+                    <label>Sun exposure:</label>
 
-        <div>
-            <input type="radio" id="in-progress" name="identification" value="in progress">
-            <label for="in-progress">In progress</label>
-        </div>
-    </div>
-    <br>
+                    <div class="form-check ml-3">
+                        <input type="radio" class="form-check-input" id="full-sun" name="sun" value="Full sun" checked required>
+                        <label class="form-check-label" for="full-sun">Full sun</label>
+                    </div>
 
-    <label for="dbpedia">DBPedia link:</label>
-    <input type="url" name="dbpedia" id="dbpedia" placeholder="https://example.com" pattern="https://.*" size="30" required>
-    <br>
+                    <div class="form-check ml-3">
+                        <input type="radio" class="form-check-input" id="partial-sun" name="sun" value="Partial sun">
+                        <label class="form-check-label" for="partial-sun">Partial sun</label>
+                    </div>
 
-    <label for="photo">Photo:</label>
-    <input type="file" id="photo" name="photo" accept="image/*" required>
-    <br>
+                    <div class="form-check ml-3">
+                        <input type="radio" class="form-check-input" id="full-shade" name="sun" value="Full shade">
+                        <label class="form-check-label" for="full-shade">Full shade</label>
+                    </div>
+                </div>
 
-    <label for="uname">Username:</label>
-    <input type="text" id ="uname" name="uname" required>
+                <hr>
 
-    <input type="submit">
-</form>
+                <!--      identification -->
+                <h6 class="mb-3">Plant Identification:</h6>
 
-<script>
-    <!--    shows flower colour option if flower attribute selected -->
-    const flowerCheck = document.getElementById("flowers");
-    const flowerColDiv = document.getElementById("flower-colour-div");
-    const flowerColCheck = document.getElementById("flower_colour");
+                <div class="form-group">
+                    <label for="name">Plant name:</label>
+                    <input type="text" class="form-control" id ="name" name="name" placeholder="Plant name" required>
+                </div>
 
-    // TODO clear flower colour text field when being hidden
-    flowerCheck.addEventListener("change", () => {
-        if (flowerCheck.checked) {
-            // flowerColCheck.style.display = "block";
-            flowerColDiv.style.display = "block";
+                <div class="form-group">
+                    <label>Identification status:</label>
 
-            flowerColCheck.required = true;
-        } else {
-            // flowerColCheck.style.display = "none";
-            flowerColDiv.style.display = "none";
+                    <div class="form-check">
+                        <input type="radio" id="complete" name="identification" value="Complete" checked required>
+                        <label for="complete">Completed</label>
+                    </div>
 
-            flowerColCheck.required = false;
-        }
-    });
-</script>
-</body>
+                    <div class="form-check">
+                        <input type="radio" id="in-progress" name="identification" value="In progress">
+                        <label for="in-progress">In progress</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dbpedia">DBPedia link:</label>
+                    <input type="url" class="form-control" name="dbpedia" id="dbpedia" placeholder="https://example.com" pattern="https://.*" required>
+                </div>
+
+                <input type="submit">
+            </form>
+        </main>
+
+        <script>
+            <!--    shows flower colour option if flower attribute selected -->
+            const flowerCheck = document.getElementById("flowers");
+            const flowerColDiv = document.getElementById("flower-colour-div");
+            const flowerColCheck = document.getElementById("flower_colour");
+
+            // TODO clear flower colour text field when being hidden
+            flowerCheck.addEventListener("change", () => {
+                if (flowerCheck.checked) {
+                    // flowerColCheck.style.display = "block";
+                    flowerColDiv.style.display = "block";
+
+                    flowerColCheck.required = true;
+                } else {
+                    // flowerColCheck.style.display = "none";
+                    flowerColDiv.style.display = "none";
+
+                    flowerColCheck.required = false;
+                }
+            });
+        </script>
+    </body>
 </html>
 
 <!--full sun, partial shade, full shade-->
