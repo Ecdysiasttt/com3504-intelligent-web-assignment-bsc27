@@ -25,6 +25,9 @@ router.get('/add', function(req, res, next) {
   });
 });
 
+//TODO - need logic for offline plant posts with iDB - labs 04/07
+
+
 /* POST plant add form */
 router.post('/add', upload.single('photo'), function(req, res, next) {
   let userData = req.body;
@@ -39,7 +42,11 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   userData.fruit = (userData.fruit === "on");
   userData.seeds = (userData.seeds === "on");
 
-  let result = plants.create(userData, filePath, date, time);
+  // TODO - generate chatroom for plant comments - lab 03
+  // (store chatroom id in plant db and grab chatroom for each plant when loaded?)
+  let chatId = 1 //Testing only
+
+  let result = plants.create(userData, filePath, date, time, chatId);
   console.log(result);
 
   res.redirect('/');

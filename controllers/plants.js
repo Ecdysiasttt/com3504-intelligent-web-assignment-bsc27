@@ -2,7 +2,7 @@
 const plantModel = require('../models/plants');
 
 // function to create new plant
-exports.create = function (userData, filePath, date, time) {
+exports.create = function (userData, filePath, date, time, chatId) {
   // create a new plant instance using the provided user data
   let plant = new plantModel ({
     date: date,
@@ -20,6 +20,7 @@ exports.create = function (userData, filePath, date, time) {
     dbpedia: userData.dbpedia,
     photo: filePath,
     uname: userData.uname,
+    chatId: chatId,
   });
 
   return plant.save().then(plant =>  {

@@ -21,6 +21,7 @@ let PlantSchema = new Schema(
     // dbpedia          string
     // photo            buffer
     // uname            string
+    // chatId           int
 
     // define the fields with correct types
     date: {type: String, required: true, max: 100},
@@ -37,7 +38,9 @@ let PlantSchema = new Schema(
     identification: {type: String, required: true, max: 100},
     dbpedia: {type: String, required: true, max: 100},
     photo: {type: String, required: true },
-    uname: {type: String, required: true, max: 100}
+    uname: {type: String, required: true, max: 100},
+    chatId: {type: Number}
+
   }
 );
 

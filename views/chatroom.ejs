@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <script src="/javascripts/index.js"></script>
+</head>
+<body onload="init()">
+<h1><%= title %></h1>
+<div id="initial_form" style="display: block">
+    <p>Please insert the id of the Room you want to Join</p>
+    <form onsubmit="return false;">
+        <p><label for="name"> Your name </label>
+            <input type="text" id="name" name="name">
+        </p>
+        <p>
+            <label for="roomNo"> Your room </label>
+            <input type="text" id="roomNo" name="roomNo">
+        </p>
+        <button id="connect" onclick="connectToRoom()">Connect</button>
+    </form>
+</div>
+<div id="chat_interface" style="display: none">
+    <div>
+        <div id="who_you_are" style="display: inline"></div>, you are in room: <div id="in_room" style="display: inline"></div>
+    </div>
+    <div id="history" class="boxed"></div>
+    <div id="input" class="bottom boxed">
+        <form onsubmit="return false;" style="width: 100%">
+            <p>
+                <label for="name"> chat: </label>
+                <input type="text" id="chat_input" name="chat_input" style="width: 80%">
+                <button id="chat_send" onclick="sendChatText()">Send</button>
+            </p>
+        </form>
+    </div>
+</div>
+</body>
+</html>
