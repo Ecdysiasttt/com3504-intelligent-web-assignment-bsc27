@@ -44,7 +44,7 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
 
   // TODO - generate chatroom for plant comments - lab 03
   // (store chatroom id in plant db and grab chatroom for each plant when loaded?)
-  let chatId = 1 //Testing only
+  let chatId = Math.floor(Math.random() * 900000 + 100000) //Random number
 
   let result = plants.create(userData, filePath, date, time, chatId);
   console.log(result);

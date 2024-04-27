@@ -23,6 +23,7 @@ function sendChatText() {
 function connectToRoom(chatId, name) {
     if (!name) name = 'Unknown-' + Math.random();
     socket.emit('create or join', chatId, name);
+    console.log('Connecting to room:', chatId);
 
 }
 

@@ -8,6 +8,7 @@ exports.init = function(io) {
             socket.on('create or join', function (room, userId) {
                 socket.join(room);
                 io.sockets.to(room).emit('joined', room, userId);
+                console.log('Joined room:', room);
             });
 
             socket.on('chat', function (room, userId, chatText) {
