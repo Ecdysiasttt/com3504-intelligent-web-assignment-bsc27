@@ -63,6 +63,7 @@
         <div>
             <% if (data.length > 0) { %>
                 <% data.forEach(plant => { %>
+                <body onload="init()">;
                     <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2">
 <!--                        meta-info: name, found by, found on... -->
                         <div class="border-bottom border-dark mb-2">
@@ -154,21 +155,21 @@
                         <div>
                             <div>
                                 <i class="fa-regular fa-comments align-middle"
-                                   title="Comments:"></i> <button onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>');">View Comments</button>
+                                   title="Comments:"></i> <button onclick="
+                                        <!--connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>');-->
+                                        toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');
+                                        ">View Comments</button>
                             <!--TODO Load chatroom for this plant using plant.chatId-->
                             <p>Chat room - <%= plant.chatId %> </p>
                             <!--                                                    -->
-                                <div id="chat_interface" style="display: none">
-                                    <div>
-                                        <div id="who_you_are" style="display: inline"></div>, you are in room: <div id="in_room" style="display: inline"></div>
-                                    </div>
-                                    <div id="history" class="boxed"></div>
+                                <div id="chat_interface-<%= plant.chatId%>" style="display: none">
+                                    <div id="history-<%= plant.chatId%>" class="boxed"></div>
                                     <div id="input" class="bottom boxed">
                                         <form onsubmit="return false;" style="width: 100%">
                                             <p>
                                                 <label for="name"> chat: </label>
                                                 <input type="text" id="chat_input" name="chat_input" style="width: 80%">
-                                                <button id="chat_send" onclick="sendChatText()">Send</button>
+                                                <button id="chat_send" onclick="sendChatText(chat_input)">Send</button>
                                             </p>
                                         </form>
                                     </div>
