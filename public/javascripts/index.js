@@ -16,36 +16,34 @@ window.onload = function () {
 }
 
 function init() {
+    name = "User-" + Math.floor(Math.random() * 90000 + 100000);
     // called when a message is received
     socket.on('chat', function (room, userId, chatText) {
-        let who = userId
-        if (userId === name) who = 'Me';
-        writeOnHistory('<b>' + who + ':</b> ' + chatText);
+        // let who = userId
+        // if (userId === name) who = 'Me';
+        writeOnHistory('<b>' + userId + ':</b> ' + chatText);
     });
 
 }
 
-function sendChatText(text) {
-    let chatText = document.getElementById('chat_input').value;
-    socket.emit('chat', roomNo, name, text.value);
-    console.log('Attempting to send message:', text.value);
+function sendChatText(text, chatId) {
+    if (text.value.toString() !== "") {
+        socket.emit('chat', chatId, name, text.value);
+    }
+    // console.log('Attempting to send message:', text.value);
 }
 
 function connectToRoom(chatId, uname) {
-    name = uname;
     roomNo = chatId;
     if (!name) name = 'Unknown-' + Math.random();
     socket.emit('create or join', chatId, name);
-    console.log('Connecting to room:', chatId);
+    // console.log('Connecting to room:', chatId);
 
 }
 
 
 function toggleComments(chatId, uname) {
-    var toCheck = "chat_interface-" + chatId.toString();
-    console.log(toCheck)
-    var chatInterface = document.getElementById(toCheck);
-    console.log(chatInterface);
+    var chatInterface = document.getElementById("chat_interface-" + chatId.toString());
     if (chatInterface.style.display === "none") {
         chatInterface.style.display = "block";
         connectToRoom(chatId, uname);
