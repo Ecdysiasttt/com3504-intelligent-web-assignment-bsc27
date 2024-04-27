@@ -16,9 +16,6 @@ window.onload = function () {
 }
 
 function init() {
-    // it sets up the interface so that userId and room are selected
-    console.log('ASDAKLSJDLKAJSD');
-
     // called when a message is received
     socket.on('chat', function (room, userId, chatText) {
         let who = userId
@@ -63,6 +60,9 @@ function toggleComments(chatId, uname) {
  * @param text: the text to append
  */
 function writeOnHistory(text) {
+    //TODO - Not loading history correctly? Comments only appear after opening for first time (reloading website deletes all message history)
+    //Might be something to do with DB...
+
     let history = document.getElementById('history-' + roomNo.toString());
     let paragraph = document.createElement('p');
     paragraph.innerHTML = text;
