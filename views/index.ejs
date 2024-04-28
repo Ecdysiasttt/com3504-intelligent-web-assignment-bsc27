@@ -63,7 +63,7 @@
         <div>
             <% if (data.length > 0) { %>
                 <% data.forEach(plant => { %>
-                    <body onload="init()">
+                    <body onload="init()"></body>
                     <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2">
 <!--                        meta-info: name, found by, found on... -->
                         <div class="border-bottom border-dark mb-2">
@@ -167,7 +167,7 @@
                                             <p>
                                                 <label for="name"> Comment: </label>
                                                 <input type="text" id="chat_input" name="chat_input" style="width: 80%">
-                                                <button id="chat_send" onclick="sendChatText(chat_input, '<%= plant.chatId%>'); chat_input.value = ''">Send</button>
+                                                <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); chat_input.value = ''">Send</button>
                                             </p>
                                         </form>
                                     </div>
@@ -179,7 +179,7 @@
             <% } else { %>
                 <p>No plants found!</p>
             <% } %>
-                    </body>
+<!--                    </body>-->
         </div>
     </main>
   </body>

@@ -1,6 +1,7 @@
 let name = null;
 let roomNo = null;
 let socket = io();
+let rooms = [];
 
 
 window.onload = function () {
@@ -21,7 +22,7 @@ function init() {
     socket.on('chat', function (room, userId, chatText) {
         // let who = userId
         // if (userId === name) who = 'Me';
-        writeOnHistory('<b>' + userId + ':</b> ' + chatText);
+        writeOnHistory('<b>' + userId + ':</b> ' + chatText, room);
     });
 
 }
@@ -31,6 +32,7 @@ function sendChatText(text, chatId) {
         socket.emit('chat', chatId, name, text.value);
     }
     // console.log('Attempting to send message:', text.value);
+    console.log('Sending to room:', chatId);
 }
 
 function connectToRoom(chatId, uname) {
@@ -47,21 +49,27 @@ function toggleComments(chatId, uname) {
     if (chatInterface.style.display === "none") {
         chatInterface.style.display = "block";
         connectToRoom(chatId, uname);
+        if (!rooms.includes(chatId))
+            rooms.push(chatId);
+
+        console.log(rooms);
+
+        // socket.emit('connect to all', rooms, name);
     }
     else {
         chatInterface.style.display = "none";
+        let pos = rooms.indexOf(chatId);
+        delete rooms[pos];
+        rooms = rooms.filter(function(e){return e });
+        console.log(rooms);
     }
 }
 
-/**
- * it appends the given html text to the history div
- * @param text: the text to append
- */
-function writeOnHistory(text) {
+function writeOnHistory(text, room) {
     //TODO - Not loading history correctly? Comments only appear after opening for first time (reloading website deletes all message history)
     //Might be something to do with DB...
 
-    let history = document.getElementById('history-' + roomNo.toString());
+    let history = document.getElementById('history-' + room.toString());
     let paragraph = document.createElement('p');
     paragraph.innerHTML = text;
     history.appendChild(paragraph);
