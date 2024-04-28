@@ -11,7 +11,7 @@
       <script src="javascripts/index.js"></script>
   </head>
 
-  <body class="p-3">
+  <body class="p-3" onload="init()">
     <header class="d-flex justify-content-between align-items-center border-bottom border-dark mb-4">
         <h1><a href="/" class="text-reset text-decoration-none"><%= site_name %></a></h1>
         <a href="/plants/add" class="text-reset text-decoration-none btn btn-outline-dark">Add plant sighting</a>
@@ -63,7 +63,6 @@
         <div>
             <% if (data.length > 0) { %>
                 <% data.forEach(plant => { %>
-                    <body onload="init()"></body>
                     <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2">
 <!--                        meta-info: name, found by, found on... -->
                         <div class="border-bottom border-dark mb-2">
@@ -179,7 +178,6 @@
             <% } else { %>
                 <p>No plants found!</p>
             <% } %>
-<!--                    </body>-->
         </div>
     </main>
   </body>

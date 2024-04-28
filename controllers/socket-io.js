@@ -11,17 +11,17 @@ exports.init = function(io) {
                 // console.log('Joined room:', room);
             });
 
-            socket.on('chat', function (roomChat, userId, chatText) {
-                io.sockets.to(roomChat).emit('chat message', chatText);
-                console.log('Sent to room:', roomChat);
+            socket.on('chat', function (chatId, userId, chatText) {
+                io.sockets.to(chatId).emit('chat', chatId, userId, chatText);
+                console.log('Sent to room:', chatId);
                 // console.log('Sent message:', chatText);
             });
 
-            socket.on('connect to all', function (rooms, userId) {
-                for (var i = 0; i<rooms.length; i++){
-                    io.sockets.to(rooms[i]).emit('joined', rooms[i], userId);
-                }
-            });
+            // socket.on('connect to all', function (rooms, userId) {
+            //     for (var i = 0; i<rooms.length; i++){
+            //         io.sockets.to(rooms[i]).emit('joined', rooms[i], userId);
+            //     }
+            // });
 
         } catch (e) {
             console.log("Failed")
