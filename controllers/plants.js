@@ -64,8 +64,8 @@ exports.formatDate = function(datetime) {
   var day = splitDate[2];
 
   return day + "/" + month + "/" + year;
-}
+};
 
 exports.formatTime = function(datetime) {
   return datetime.split("T")[1];
-}
+};

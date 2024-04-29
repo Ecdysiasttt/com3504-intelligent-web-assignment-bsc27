@@ -52,4 +52,18 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   res.redirect('/');
 });
 
+router.get('/:plantId', function (req, res, next) {
+  var plantId = req.params.plantId;
+
+  var allPlants = plants.getAll();
+
+  var thisPlant = plantId;
+
+  console.log(plantId);
+
+  res.render('plant', {
+    plant: thisPlant
+  });
+
+});
 module.exports = router;

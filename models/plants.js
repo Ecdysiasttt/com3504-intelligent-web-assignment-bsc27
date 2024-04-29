@@ -3,6 +3,19 @@ let mongoose = require('mongoose');
 // get the schema class from mongoose
 let Schema = mongoose.Schema;
 
+let CommentSchema = new Schema(
+
+    {
+        //userId        int
+        //text          string
+
+        userId: {type: String, required: true},
+        text: {type: String, required: true}
+
+    }
+
+)
+
 // define the schema for the student model
 let PlantSchema = new Schema(
   {
@@ -39,7 +52,8 @@ let PlantSchema = new Schema(
     dbpedia: {type: String, required: true, max: 100},
     photo: {type: String, required: true },
     uname: {type: String, required: true, max: 100},
-    chatId: {type: Number}
+    chatId: {type: Number},
+      comments: [CommentSchema]
 
   }
 );

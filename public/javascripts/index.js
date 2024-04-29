@@ -3,6 +3,8 @@ let roomNo = null;
 let socket = io();
 let rooms = [];
 
+// var comments = require('../../controllers/comments');
+
 
 window.onload = function () {
     if ('serviceWorker' in navigator) {
@@ -20,9 +22,6 @@ function init() {
     name = "User-" + Math.floor(Math.random() * 90000 + 100000);
     // called when a message is received
     socket.on('chat', function (chatId, userId, chatText) {
-        console.log('TEst');
-        // let who = userId
-        // if (userId === name) who = 'Me';
         writeOnHistory('<b>' + userId + ':</b> ' + chatText, chatId);
     });
 
@@ -32,8 +31,10 @@ function sendChatText(text, chatId) {
     if (text.value.toString() !== "") {
         socket.emit('chat', chatId, name, text.value);
     }
-    // console.log('Attempting to send message:', text.value);
     console.log('Sending to room:', chatId);
+
+    // let result = comments.create(chatId, name, text.value);
+    // console.log(result);
 }
 
 function connectToRoom(chatId, uname) {

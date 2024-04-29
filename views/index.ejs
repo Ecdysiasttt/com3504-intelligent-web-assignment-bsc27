@@ -37,8 +37,8 @@
             if (isVertical) {
               var infoContainer = document.getElementById('info-div-' + plantID);
 
-              // set photo width to 100%
-              photo.style.width = "100%";
+              // set photo width to 35% (was 100% before)
+              photo.style.width = "35%";
 
               infoContainer.style.flexDirection = "column-reverse";
 
@@ -67,7 +67,13 @@
 <!--                        meta-info: name, found by, found on... -->
                         <div class="border-bottom border-dark mb-2">
 <!--                            <i class="fa-solid fa-file-signature align-middle"></i>-->
-                            <h4 class="mb-2"><%= plant.name %></h4> <!--plant name-->
+                            <div class="d-flex justify-content-between">
+                                <h4 class="mb-2"><%= plant.name %></h4> <!--plant name-->
+                                <a href="/plants/<%= plant._id %>" class="mb-2">View details</a>
+<!--                                    <a href="/plants/test"> View details</a>-->
+                            </div>
+<!--                            <h4 class="mb-2"><%= plant.name %></h4> &lt;!&ndash;plant name&ndash;&gt;-->
+
                             <div class="d-flex justify-content-between">
                                 <p class="mb-2">
                                     <i class="fa-solid fa-magnifying-glass align-middle"
@@ -78,6 +84,7 @@
                                        title="User"></i> <%= plant.uname %>
                                 </p> <!--spotted by-->
                             </div>
+
                         </div>
 
                         <div class="d-flex justify-content-between border-bottom border-dark mb-3"
@@ -150,29 +157,28 @@
                           test("<%= plant._id %>");
                         </script>
                         </div>
-
-                        <div>
-                            <div>
-                                <!--TODO - Fix comments history not being shown when user opens comments initially or reloads page -->
-                                <!--TODO - Fix comments send to wrong plant if receiver opens new chatroom -->
-                                <i class="fa-regular fa-comments align-middle"
-                                   title="Comments:"></i> <button onclick="
-                                        toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');
-                                        ">View Comments</button>
-                                <div id="chat_interface-<%= plant.chatId%>" style="display: none">
-                                    <div id="history-<%= plant.chatId%>" class="boxed"></div>
-                                    <div id="input" class="bottom boxed">
-                                        <form onsubmit="return false;" style="width: 100%">
-                                            <p>
-                                                <label for="name"> Comment: </label>
-                                                <input type="text" id="chat_input" name="chat_input" style="width: 80%">
-                                                <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); chat_input.value = ''">Send</button>
-                                            </p>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<!--                        <div>-->
+<!--                            <div>-->
+<!--                                &lt;!&ndash;TODO - Fix comments history not being shown when user opens comments initially or reloads page &ndash;&gt;-->
+<!--                                &lt;!&ndash;TODO - Fix comments send to wrong plant if receiver opens new chatroom &ndash;&gt;-->
+<!--                                <i class="fa-regular fa-comments align-middle"-->
+<!--                                   title="Comments:"></i> <button onclick="-->
+<!--                                        toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');-->
+<!--                                        ">View Comments</button>-->
+<!--                                <div id="chat_interface-<%= plant.chatId%>" style="display: none">-->
+<!--                                    <div id="history-<%= plant.chatId%>" class="boxed"></div>-->
+<!--                                    <div id="input" class="bottom boxed">-->
+<!--                                        <form onsubmit="return false;" style="width: 100%">-->
+<!--                                            <p>-->
+<!--                                                <label for="name"> Comment: </label>-->
+<!--                                                <input type="text" id="chat_input" name="chat_input" style="width: 80%">-->
+<!--                                                <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); chat_input.value = ''">Send</button>-->
+<!--                                            </p>-->
+<!--                                        </form>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
                     </div>
                 <% });%>
             <% } else { %>
