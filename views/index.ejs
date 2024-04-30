@@ -19,6 +19,55 @@
 
     <main>
         <script>
+
+
+            //  check if geolocation is supported
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                    console.log("geolocation supported");
+                } else {
+                    x.innerHTML = "Geolocation is not supported by this browser.";
+                    console.log("Geolocation is not supported by this browser.");
+                }
+            }
+
+            // Update geolocation data
+            const watchID = navigator.geolocation.watchPosition((position) => {
+                doSomething(position.coords.latitude, position.coords.longitude);
+            });
+
+            function presentPosition(position) {
+                doSomething(position.coords.latitude, position.coords.longitude);
+            }
+
+            // Handling errors
+            function showError(error) {
+                switch(error.code) {
+                    case error.TIMEOUT:
+                        x.innerHTML = "The request to get user location timed out."
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        x.innerHTML = "An unknown error occurred."
+                        break;
+                    case error.PERMISSION_DENIED:
+                        x.innerHTML = "User denied the request for Geolocation."
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        x.innerHTML = "Location information is unavailable."
+                        break;
+                }
+            }
+
+            const options = {
+                enableHighAccuracy: true,
+                maximumAge: 30000,
+                timeout: 27000,
+            };
+
+            const watchID = navigator.geolocation.watchPosition(presentPosition, showError, options);
+
+
           function test(plantID) {
             var photo = document.getElementById('photo-' + plantID);
 
