@@ -78,4 +78,3 @@ function writeOnHistory(text, test) {
     document.getElementById('chat_input').value = '';
 }
 
-
