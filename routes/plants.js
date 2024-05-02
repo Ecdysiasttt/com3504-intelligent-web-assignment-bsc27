@@ -52,18 +52,26 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   res.redirect('/');
 });
 
-router.get('/:plantId', function (req, res, next) {
-  var plantId = req.params.plantId;
+router.get('/:plantId', async function (req, res, next) {
+  try {
+    var plantId = req.params.plantId;
 
-  var allPlants = plants.getAll();
+    // Wait for the promise to resolve
+    var allPlants = await plants.getAll();
 
-  var thisPlant = plantId;
+    var allPlantsJSON = JSON.parse(allPlants);
 
-  console.log(plantId);
+    // Now you have the plants, you can find the specific one by ID
+    var thisPlant = allPlantsJSON.find(plant => plant._id === plantId);
 
-  res.render('plant', {
-    plant: thisPlant
-  });
+    console.log(plantId);
 
+    res.render('plant', {
+      plant: thisPlant
+    });
+  } catch (error) {
+    // Handle any errors
+    next(error);
+  }
 });
 module.exports = router;
