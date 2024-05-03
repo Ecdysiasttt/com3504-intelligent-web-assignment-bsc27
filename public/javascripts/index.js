@@ -78,3 +78,37 @@ function writeOnHistory(text, test) {
     document.getElementById('chat_input').value = '';
 }
 
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            // Get the latitude and longitude from the position object
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+
+            // You can do further processing or return the coordinates as needed
+            let location = { latitude, longitude };
+            // Assuming you want to return the coordinates
+            console.log(location)
+            return location;
+        }, function(error) {
+            // Handle error cases
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    console.log("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    console.log("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    console.log("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    console.log("An unknown error occurred.");
+                    break;
+            }
+        });
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+}
