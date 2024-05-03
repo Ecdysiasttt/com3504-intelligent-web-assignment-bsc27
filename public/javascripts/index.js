@@ -78,3 +78,48 @@ function writeOnHistory(text, test) {
     document.getElementById('chat_input').value = '';
 }
 
+    // Asks for permissions from the user 
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(function (permission) {
+                if (permission === "granted") {
+                    navigator.serviceWorker.ready
+                        .then(function (serviceWorkerRegistration) {
+                            serviceWorkerRegistration.showNotification("Todo App",
+                                {body: "Notifications are enabled!"})
+                                .then(r =>
+                                    console.log(r)
+                                );
+                        });
+                }
+            });
+        }
+    }
+    if (navigator.onLine) {
+        fetch('http://localhost:3000/todos')
+            .then(function (res) {
+                return res.json();
+            }).then(function (newTodos) {
+            openTodosIDB().then((db) => {
+                insertTodoInList(db, newTodos)
+                deleteAllExistingTodosFromIDB(db).then(() => {
+                    addNewTodosToIDB(db, newTodos).then(() => {
+                        console.log("All new todos added to IDB")
+                    })
+                });
+            });
+        });
+
+    } else {
+        console.log("Offline mode")
+        openTodosIDB().then((db) => {
+            getAllTodos(db).then((todos) => {
+                for (const todo of todos) {
+                    insertTodoInList(todo)
+                }
+            });
+        });
+
+    }
+}
