@@ -3,6 +3,8 @@ let roomNo = null;
 let socket = io();
 let rooms = [];
 
+
+// var plants = require('../../controllers/plants');
 // var comments = require('../../controllers/comments');
 
 
@@ -41,11 +43,11 @@ function connectToRoom(chatId, uname) {
     roomNo = chatId;
     if (!name) name = 'Unknown-' + Math.random();
     socket.emit('create or join', chatId, name);
-    console.log('Connecting to room:', chatId);
+    // console.log('Connecting to room:', chatId);
 
 }
 
-
+//TODO - probably want to delete the 'rooms' stuff because it really doesn't do much right now. Leaving in for now as it isn't *harming* anything
 function toggleComments(chatId, uname) {
     var chatInterface = document.getElementById("chat_interface-" + chatId.toString());
     if (chatInterface.style.display === "none") {
@@ -68,7 +70,7 @@ function toggleComments(chatId, uname) {
 }
 
 function writeOnHistory(text, test) {
-    //TODO - Not loading history correctly? Comments only appear after opening for first time (reloading website deletes all message history)
+    //TODO - Not loading history correctly? Comments only appear after opening for first time (reloading page deletes all message history)
     //Might be something to do with DB...
 
     let history = document.getElementById('history-' + test.toString());
@@ -79,36 +81,23 @@ function writeOnHistory(text, test) {
 }
 
 
-function getLocation() {
+function getLocation(event) {
+    event.preventDefault();
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             // Get the latitude and longitude from the position object
             let latitude = position.coords.latitude;
             let longitude = position.coords.longitude;
 
-            // You can do further processing or return the coordinates as needed
             let location = { latitude, longitude };
-            // Assuming you want to return the coordinates
             console.log(location)
+            document.getElementById("longitude").value = location.longitude;
+            document.getElementById("latitude").value = location.latitude;
+            return longitude, latitude;
             return location;
-        }, function(error) {
-            // Handle error cases
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    console.log("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    console.log("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    console.log("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    console.log("An unknown error occurred.");
-                    break;
-            }
         });
     } else {
         console.log("Geolocation is not supported by this browser.");
+        return 0, 0;
     }
 }

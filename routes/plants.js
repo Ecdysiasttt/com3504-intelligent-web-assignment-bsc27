@@ -35,6 +35,10 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   console.log(userData.dateTime);
   let date = plants.formatDate(userData.dateTime.toString());
   let time = plants.formatTime(userData.dateTime.toString());
+  let comments = null;
+  let longitude = userData.longitude;
+  let latitude = userData.latitude;
+  let thisLocation = [longitude, latitude];
 
   // set checkboxes to boolean before storing in db
   userData.flowers = (userData.flowers === "on");
@@ -46,7 +50,7 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   // (store chatroom id in plant db and grab chatroom for each plant when loaded?)
   let chatId = Math.floor(Math.random() * 900000 + 100000) //Random number
 
-  let result = plants.create(userData, filePath, date, time, chatId);
+  let result = plants.create(userData, filePath, date, time, chatId, comments, longitude, latitude);
   console.log(result);
 
   res.redirect('/');

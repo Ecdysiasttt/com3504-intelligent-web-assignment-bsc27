@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
         <link href="https://cdn.jsdelivr.net/npm/vesper-icons@5.11.2/css/vesper-icons.min.css" rel="stylesheet">
         <script src="https://kit.fontawesome.com/7f6de5401f.js" crossorigin="anonymous"></script>
+        <script src = "../javascripts/index.js"></script>
     </head>
 
     <body class="p-3">
@@ -50,6 +51,14 @@
                     <input type="file" class="form-control-file" id="photo" name="photo" accept="image/*" required>
                 </div>
 
+                <hr>
+
+                <div class="form-group">
+                    <label for="">Location:</label>
+                    <input type="text" id="latitude" name="latitude" placeholder="Latitude" required>
+                    <input type="text" id="longitude" name="longitude" placeholder="Longitude" required>
+                    <button onclick="getLocation(event);">Get Location </button>
+                </div>
                 <hr>
 
                 <!--      plant characteristics -->
