@@ -5,7 +5,7 @@ let rooms = [];
 
 // var comments = require('../../controllers/comments');
 
-
+// register service worker
 window.onload = function () {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js', {scope: '/'})
@@ -78,18 +78,5 @@ function writeOnHistory(text, test) {
     document.getElementById('chat_input').value = '';
 }
 
-// register service worker
 
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker
-            .register("../sw.js")
-            .then((registration) => {
-                console.log("Service worker registered");
-            })
-            .catch((error) => {
-                console.error("service worker failed to register:", error);
-            });
-    });
-}
 
