@@ -107,6 +107,23 @@ function setMarker(latitude, longitude){
     marker.setLatLng([latitude, longitude]);
 }
 
+function setMapView(event, latitude, longitude){
+    if(event){
+        event.preventDefault();
+    }
+    if (latitude && longitude)
+        map.setView([latitude, longitude], 13);
+    else
+        map.setView([0, 0], 13);
+}
+
+function setAtGetMapPos(event){
+    var latitude = document.getElementById("latitude").value;
+    var longitude = document.getElementById("longitude").value;
+
+    setMapView(event, latitude, longitude);
+}
+
 
 function setAtGetPos() {
     var latitude = document.getElementById("latitude").value;
