@@ -1,7 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var plants = require('../controllers/plants');
-var todoController = require('../controllers/todo');
+
+//TODO =============== THIS NEEDS DEFINING - THERE IS NO SUCH FILE =============== //
+// var todoController = require('../controllers/todo');
+
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -21,24 +25,26 @@ router.get('/', function(req, res, next) {
 module.exports = router;
 
 // route to get all todos
-router.get('/todos', function (req, res, next) {
-    todoController.getAll().then(todos => {
-        console.log(todos);
-        return res.status(200).send(todos);
-    }).catch(err => {
-        console.log(err);
-        res.status(500).send(err);
-    });
-})
 
-// route to add a new todo
-router.post('/add-todo', function(req, res, next) {
-    console.log("Received a todo: " + req.body.text);
-    todoController.create(req.body).then(todo => {
-        console.log(todo);
-        res.status(200).send(todo);
-    }).catch(err => {
-        console.log(err);
-        res.status(500).send(err);
-    });
-});
+//TODO =============== COMMENTING THESE OUT UNTIL TODOCONTROLLER IS ADDED =============== //
+// router.get('/todos', function (req, res, next) {
+//     todoController.getAll().then(todos => {
+//         console.log(todos);
+//         return res.status(200).send(todos);
+//     }).catch(err => {
+//         console.log(err);
+//         res.status(500).send(err);
+//     });
+// })
+//
+// // route to add a new todo
+// router.post('/add-todo', function(req, res, next) {
+//     console.log("Received a todo: " + req.body.text);
+//     todoController.create(req.body).then(todo => {
+//         console.log(todo);
+//         res.status(200).send(todo);
+//     }).catch(err => {
+//         console.log(err);
+//         res.status(500).send(err);
+//     });
+// });
