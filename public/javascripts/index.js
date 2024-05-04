@@ -2,6 +2,9 @@ let name = null;
 let roomNo = null;
 let socket = io();
 let rooms = [];
+// let map = null;
+var marker;
+var map;
 
 
 // var plants = require('../../controllers/plants');
@@ -67,6 +70,7 @@ window.onload = function () {
 }
 
 function init() {
+    //Create user info - unique name and function to add message to history when sent
     name = "User-" + Math.floor(Math.random() * 90000 + 100000);
     // called when a message is received
     socket.on('chat', function (chatId, userId, chatText) {
@@ -74,6 +78,44 @@ function init() {
     });
 
 }
+
+function loadMap(){
+    //Initialise leaflet map
+    map = L.map('map').setView([0, 0], 13); //Default long/lat of 0,0
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    marker = L.marker([0,0]).addTo(map);
+}
+
+function setMapClickable(){
+    //Set click event
+    map.on('click', function (e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        marker.setLatLng([lat, lng]);
+
+        document.getElementById("latitude").value = lat.toFixed(6);
+        document.getElementById("longitude").value = lng.toFixed(6);
+    })
+}
+
+function setMarker(latitude, longitude){
+    marker.setLatLng([latitude, longitude]);
+}
+
+
+function setAtGetPos() {
+    var latitude = document.getElementById("latitude").value;
+    var longitude = document.getElementById("longitude").value;
+
+    setMarker(latitude, longitude);
+}
+
+
 
 function sendChatText(text, chatId) {
     if (text.value.toString() !== "") {
@@ -139,6 +181,7 @@ function getLocation(event) {
             console.log(location)
             document.getElementById("longitude").value = location.longitude;
             document.getElementById("latitude").value = location.latitude;
+            setAtGetPos();
             return longitude, latitude;
         });
     } else {

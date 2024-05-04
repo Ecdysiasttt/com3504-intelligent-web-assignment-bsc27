@@ -11,13 +11,22 @@
     <script src="https://kit.fontawesome.com/7f6de5401f.js" crossorigin="anonymous"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="../javascripts/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src = "https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 </head>
 
-<body class="p-3" onload="init()">
+<body class="p-3" onload="init(); loadMap(); setMarker('<%= plant.latitude%>', '<%= plant.longitude%>')">
 <header class="d-flex justify-content-between align-items-center border-bottom border-dark mb-4">
     <h1><a href="/" class="text-reset text-decoration-none">Plantpedia</a></h1>
     <a href="/" class="text-reset text-decoration-none btn btn-outline-dark">Return home</a>
 </header>
+<style>
+    #map { /* Set map container size */
+        height: 400px;
+        width: 100%;
+    }
+</style>
 
 <main>
     <div>
@@ -114,6 +123,7 @@
 
                     <div>
                         <h6>Location:</h6>
+                            <div id="map"></div>
                         <p>Longitude: <%= plant.longitude%>, Latitude: <%= plant.latitude%></p>
 <!--                        <p>Latitude: <%= plant.latitude%></p>-->
                     </div>
