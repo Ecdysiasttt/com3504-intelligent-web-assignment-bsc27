@@ -1,7 +1,7 @@
 // Import the todo model
 const todoModel = require('../models/todo');
 
-// create new todos
+// Create new todos
 exports.create = function (userData) {
     console.log(userData)
     let todo = new todoModel({
@@ -16,7 +16,7 @@ exports.create = function (userData) {
     });
 };
 
-// get all todos
+// Get all todos
 exports.getAll = function () {
     // Retrieve all todos from the database
     return todoModel.find({}).then(todos => {
