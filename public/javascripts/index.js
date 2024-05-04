@@ -18,6 +18,52 @@ window.onload = function () {
                 console.log('Service Worker registration failed: ', err);
             });
     }
+
+    // Asks for permissions from the user
+    if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(function (permission) {
+                if (permission === "granted") {
+                    navigator.serviceWorker.ready
+                        .then(function (serviceWorkerRegistration) {
+                            serviceWorkerRegistration.showNotification("Todo App",
+                                {body: "Notifications are enabled!"})
+                                .then(r =>
+                                    console.log(r)
+                                );
+                        });
+                }
+            });
+        }
+    }
+    if (navigator.onLine) {
+        fetch('http://localhost:3000/todos')
+            .then(function (res) {
+                return res.json();
+            }).then(function (newTodos) {
+            openTodosIDB().then((db) => {
+                insertTodoInList(db, newTodos)
+                deleteAllExistingTodosFromIDB(db).then(() => {
+                    addNewTodosToIDB(db, newTodos).then(() => {
+                        console.log("All new todos added to IDB")
+                    })
+                });
+            });
+        });
+
+    } else {
+        console.log("Offline mode")
+        openTodosIDB().then((db) => {
+            getAllTodos(db).then((todos) => {
+                for (const todo of todos) {
+                    insertTodoInList(todo)
+                }
+            });
+        });
+
+    }
+
 }
 
 function init() {
@@ -49,7 +95,7 @@ function connectToRoom(chatId, uname) {
 
 //TODO - probably want to delete the 'rooms' stuff because it really doesn't do much right now. Leaving in for now as it isn't *harming* anything
 function toggleComments(chatId, uname) {
-    var chatInterface = document.getElementById("chat_interface-" + chatId.toString());
+    const chatInterface = document.getElementById("chat_interface-" + chatId.toString());
     if (chatInterface.style.display === "none") {
         chatInterface.style.display = "block";
         connectToRoom(chatId, uname);
@@ -94,7 +140,6 @@ function getLocation(event) {
             document.getElementById("longitude").value = location.longitude;
             document.getElementById("latitude").value = location.latitude;
             return longitude, latitude;
-            return location;
         });
     } else {
         console.log("Geolocation is not supported by this browser.");
@@ -102,13 +147,14 @@ function getLocation(event) {
     }
 }
 
+
 function removePlant(id){
 
     fetch(`/plants/${id}`, {
         method: 'delete'
     }).then(response => {
         if (response.ok) {
-            console.log('Succesful removal');
+            console.log('Successful removal');
             window.location.reload();
         } else {
             console.log('Failed removal');
@@ -118,3 +164,5 @@ function removePlant(id){
     });
 
 }
+
+
