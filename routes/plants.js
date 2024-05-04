@@ -78,4 +78,20 @@ router.get('/:plantId', async function (req, res, next) {
     next(error);
   }
 });
+
+
+router.delete('/:plantId', async function (req, res, next) {
+  const { plantId } = req.params;
+  try {
+
+    const deletedPlant = await plants.remove(plantId);
+
+    res.json({ message: 'Plant removed successfully', deletedPlant });
+  } catch (error) {
+
+    next(error);
+  }
+});
+
+
 module.exports = router;

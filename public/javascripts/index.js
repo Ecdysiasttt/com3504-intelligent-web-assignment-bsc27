@@ -101,3 +101,20 @@ function getLocation(event) {
         return 0, 0;
     }
 }
+
+function removePlant(id){
+
+    fetch(`/plants/${id}`, {
+        method: 'delete'
+    }).then(response => {
+        if (response.ok) {
+            console.log('Succesful removal');
+            window.location.reload();
+        } else {
+            console.log('Failed removal');
+        }
+    }).catch(error => {
+        console.log('Removal error:', error);
+    });
+
+}

@@ -42,11 +42,11 @@ exports.create = function (userData, filePath, date, time, chatId, comments, lon
 
 };
 
-// Function to get all students
+// Function to get all plants
 exports.getAll = function () {
-  // Retrieve all students from the database
+  // Retrieve all plants from the database
   return plantModel.find({}).then(plants => {
-    // Return the list of students as a JSON string
+    // Return the list of plants as a JSON string
     return JSON.stringify(plants);
   }).catch(err => {
     // Log the error if retrieval fails
@@ -72,3 +72,8 @@ exports.formatDate = function(datetime) {
 exports.formatTime = function(datetime) {
   return datetime.split("T")[1];
 };
+
+
+exports.remove = function(id){
+  return plantModel.findOneAndDelete({_id: id});
+}
