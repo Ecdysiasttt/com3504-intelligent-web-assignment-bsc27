@@ -31,8 +31,6 @@ router.get('/', function(req, res, next) {
   });
 });
 
-module.exports = router;
-
 // route to get all todos
 
 //TODO =============== COMMENTING THESE OUT UNTIL TODOCONTROLLER IS ADDED =============== //
@@ -57,3 +55,50 @@ router.post('/add-todo', function(req, res, next) {
         res.status(500).send(err);
     });
 });
+
+
+
+/*
+  // Knowledge graph from DBpedia
+
+  // Create a new GET route for plant
+router.get('/' + plant.name, function (req, res, next) {
+
+  // Retrieve data from DBpedia resource
+  const resource = 'http://dbpedia.org/resource/' + plant.name;
+
+  // SPARQL query
+  const endpointUrl = 'https://dbpedia.org/sparql';
+  const sparqlQuery = `
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX dbo: <http://dbpedia.org/ontology/>
+
+    SELECT ?label ?plant
+    WHERE {
+      <${resource}> rdfs:label ?label .
+      <${resource}> dbo:plant ?plant .
+    FILTER (langMatches(lang(?label), "en")) .
+    }`;
+
+  const encodedQuery = encodeURIComponent(sparqlQuery);
+
+  const url = `${endpointUrl}?query=${encodedQuery}&format=json`;
+
+  // Retrieve data by fetch
+  fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        let bindings = data.results.bindings;
+        let result = JSON.stringify(bindings);
+
+        // Render the result in ejs
+        res.render('plant', {
+          title: bindings[0].label.value,
+          country: bindings[0].plant.value,
+          JSONresult: result
+        });
+      });
+});
+*/
+
+module.exports = router;
