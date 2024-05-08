@@ -29,7 +29,7 @@ router.get('/add', function(req, res, next) {
 
 
 /* POST plant add form */
-router.post('/add', upload.single('photo'), function(req, res, next) {
+router.post('/add', upload.single('photo'), async function(req, res, next) {
   let userData = req.body;
   let filePath = req.file.path;
   console.log(userData.dateTime);
@@ -46,9 +46,16 @@ router.post('/add', upload.single('photo'), function(req, res, next) {
   userData.fruit = (userData.fruit === "on");
   userData.seeds = (userData.seeds === "on");
 
-  // TODO - generate chatroom for plant comments - lab 03
-  // (store chatroom id in plant db and grab chatroom for each plant when loaded?)
+  //Generates a unique chatId for the comments. A chatId is generated, and then checked for validity until a unique ID is created.
   let chatId = Math.floor(Math.random() * 900000 + 100000) //Random number
+  // let chatId = 1; //Testing function
+
+  let valid = await checkIdValid(chatId);
+  while (!valid){
+    chatId = Math.floor(Math.random() * 900000 + 100000) //Random number
+    valid = await checkIdValid(chatId);
+  }
+
 
   let result = plants.create(userData, filePath, date, time, chatId, comments, longitude, latitude);
   console.log(result);
@@ -65,10 +72,7 @@ router.get('/:plantId', async function (req, res, next) {
 
     var allPlantsJSON = JSON.parse(allPlants);
 
-    // Now you have the plants, you can find the specific one by ID
     var thisPlant = allPlantsJSON.find(plant => plant._id === plantId);
-
-    console.log(plantId);
 
     res.render('plant', {
       plant: thisPlant
@@ -92,6 +96,20 @@ router.delete('/:plantId', async function (req, res, next) {
     next(error);
   }
 });
+
+async function checkIdValid (id) {
+  var allPlants = await plants.getAll();
+  var allPlantsJSON = JSON.parse(allPlants);
+
+  if (allPlantsJSON.find(plant => plant.chatId === id)){
+    console.log('ID already exists.')
+    return false;
+  }
+  else{
+    console.log('Unique ID.')
+    return true;
+  }
+}
 
 
 module.exports = router;
