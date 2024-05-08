@@ -124,33 +124,33 @@
 
             <div>
                 <h6>Location:</h6>
-                    <div id="map"></div>
+                <div id="map"></div>
                 <p>Latitude: <%= plant.latitude%>, Longitude: <%= plant.longitude%></p>
                 <button onclick="setMapView(event, '<%= plant.latitude%>', '<%= plant.longitude%>');">Re-Centre view</button>
             </div>
             <hr>
+            <div>
                 <div>
-                    <div>
-                        <!--TODO - Fix comments history not being shown when user opens comments initially or reloads page -->
-                        <!--TODO - Fix comments send to wrong plant if receiver opens new chatroom -->
-                        <i class="fa-regular fa-comments align-middle"
-                           title="Comments:"></i> <button onclick="
-                                toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');
-                                ">View Comments</button>
-                        <div id="chat_interface-<%= plant.chatId%>" style="display: none">
-                            <div id="history-<%= plant.chatId%>" class="boxed"></div>
-                            <div id="input" class="bottom boxed">
-                                <form onsubmit="return false;" style="width: 100%">
-                                    <p>
-                                        <label for="name"> Comment: </label>
-                                        <input type="text" id="chat_input" name="chat_input" style="width: 80%">
-                                        <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); chat_input.value = ''">Send</button>
-                                    </p>
-                                </form>
-                            </div>
+                    <!--TODO - Fix comments history not being shown when user opens comments initially or reloads page -->
+                    <!--TODO - Fix comments send to wrong plant if receiver opens new chatroom -->
+                    <i class="fa-regular fa-comments align-middle"
+                       title="Comments:"></i> <button onclick="
+                            toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');
+                            ">View Comments</button>
+                    <div id="chat_interface-<%= plant.chatId%>" style="display: none">
+                        <div id="history-<%= plant.chatId%>" class="boxed"></div>
+                        <div id="input" class="bottom boxed">
+                            <form onsubmit="return false;" style="width: 100%">
+                                <p>
+                                    <label for="name"> Comment: </label>
+                                    <input type="text" id="chat_input" name="chat_input" style="width: 80%">
+                                    <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); addCommentToPlantDB('<%= plant._id%>', chat_input.value); chat_input.value = ''">Send</button>
+                                </p>
+                            </form>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
 </main>
