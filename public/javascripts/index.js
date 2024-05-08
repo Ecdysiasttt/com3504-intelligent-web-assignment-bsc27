@@ -226,3 +226,27 @@ function removePlant(id){
 }
 
 
+function addCommentToPlantDB(plantID, comment) {
+
+    const requestBody = {
+        text: comment
+    };
+    fetch(`/plants/${plantID}/comments`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+
+    }).then(response => {
+        if (response.ok) {
+            console.log('Got plant');
+        } else {
+            console.log('Could not fetch post for comment');
+        }
+    }).catch(error => {
+        console.log('Error fetching post for comment:', error);
+    });
+
+
+}

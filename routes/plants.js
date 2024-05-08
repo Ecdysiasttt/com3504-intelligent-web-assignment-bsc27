@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var plants = require('../controllers/plants');
 var multer = require('multer');
+const Plant = require('../models/plants');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -97,11 +98,45 @@ router.delete('/:plantId', async function (req, res, next) {
   }
 });
 
-async function checkIdValid (id) {
+
+router.post('/:plantId/comments', async function (req, res, next) {
+
+  const plantId = req.params.plantId;
+  const { text } = req.body;
+
+  try {
+
+
+    const plant = await Plant.findById(plantId);
+
+    const newComment = {
+      userId: 1,
+      text: text
+    };
+
+    if(plant.comments == null){
+      plant.comments = [newComment]; //Initialise comments if none exist.
+    } else {
+      plant.comments.push(newComment); //Add to existing array if comments exists.
+    }
+
+    await plant.save();
+
+    console.log('Successfully added comment');
+    console.log(plant.comments);
+
+
+  } catch (error) {
+    console.log('Failed to add comment:', error);
+  }
+
+});
+
+async function checkIdValid (chatID) {
   var allPlants = await plants.getAll();
   var allPlantsJSON = JSON.parse(allPlants);
 
-  if (allPlantsJSON.find(plant => plant.chatId === id)){
+  if (allPlantsJSON.find(plant => plant.chatId === chatID)){
     console.log('ID already exists.')
     return false;
   }

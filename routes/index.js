@@ -3,7 +3,7 @@ var router = express.Router();
 var plants = require('../controllers/plants');
 
 //TODO =============== THIS NEEDS DEFINING - THERE IS NO SUCH FILE =============== //
-// var todoController = require('../controllers/todo');
+var todoController = require('../controllers/todo');
 
 
 
@@ -27,24 +27,24 @@ module.exports = router;
 // route to get all todos
 
 //TODO =============== COMMENTING THESE OUT UNTIL TODOCONTROLLER IS ADDED =============== //
-// router.get('/todos', function (req, res, next) {
-//     todoController.getAll().then(todos => {
-//         console.log(todos);
-//         return res.status(200).send(todos);
-//     }).catch(err => {
-//         console.log(err);
-//         res.status(500).send(err);
-//     });
-// })
-//
-// // route to add a new todo
-// router.post('/add-todo', function(req, res, next) {
-//     console.log("Received a todo: " + req.body.text);
-//     todoController.create(req.body).then(todo => {
-//         console.log(todo);
-//         res.status(200).send(todo);
-//     }).catch(err => {
-//         console.log(err);
-//         res.status(500).send(err);
-//     });
-// });
+router.get('/todos', function (req, res, next) {
+    todoController.getAll().then(todos => {
+        console.log(todos);
+        return res.status(200).send(todos);
+    }).catch(err => {
+        console.log(err);
+        res.status(500).send(err);
+    });
+})
+
+// route to add a new todo
+router.post('/add-todo', function(req, res, next) {
+    console.log("Received a todo: " + req.body.text);
+    todoController.create(req.body).then(todo => {
+        console.log(todo);
+        res.status(200).send(todo);
+    }).catch(err => {
+        console.log(err);
+        res.status(500).send(err);
+    });
+});
