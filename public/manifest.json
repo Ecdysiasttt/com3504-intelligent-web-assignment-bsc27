@@ -1,0 +1,17 @@
+{
+  "lang": "en-uk",
+  "name": "Plantpedia",
+  "short_name": "Plantpedia: Log your plant sightings",
+  "description": "An application that allows you to track plant sightings",
+  "start_url": "/",
+  "background_color": "#2f3d58",
+  "theme_color": "#2f3d58",
+  "orientation": "any",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/images/image_icon.png",
+      "sizes": "512x512"
+    }
+  ]
+}

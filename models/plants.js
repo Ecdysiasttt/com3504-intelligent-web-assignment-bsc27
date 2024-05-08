@@ -53,9 +53,9 @@ let PlantSchema = new Schema(
     photo: {type: String, required: true },
     uname: {type: String, required: true, max: 100},
     chatId: {type: Number},
-      comments: [CommentSchema],
-      longitude: {type: Number, required: true},
-      latitude: {type: Number, required: true}
+    comments: [CommentSchema],
+    longitude: {type: Number, required: true},
+    latitude: {type: Number, required: true}
 
   }
 );

@@ -6,6 +6,15 @@ var plants = require('../controllers/plants');
 // var todoController = require('../controllers/todo');
 
 
+router.get('/plants', function (req, res, next) {
+  plants.getAll().then(plant => {
+    console.log(plant);
+    return res.status(200).send(plants);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).send(err);
+  });
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

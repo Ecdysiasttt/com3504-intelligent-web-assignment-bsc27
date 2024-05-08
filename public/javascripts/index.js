@@ -1,17 +1,103 @@
 let name = null;
 let roomNo = null;
-let socket = io();
+// let socket = io();
+
+let socket;
+
+if (typeof io === "function") {
+    socket = io();
+} else {
+    console.error("Socket.io is not available.");
+}
+
 let rooms = [];
 // let map = null;
 var marker;
 var map;
 
+const insertPlantInList = (plant) => {
+    if (plant.name) {
+        const container = document.getElementById("plant-container");
+
+        const div = document.createElement("div");
+        div.id = `div-${plant._id}`;
+        div.classList.add("mb-2", "border", "border-dark", "rounded", "p-2");
+
+        // Construct the HTML content for the plant
+        div.innerHTML = `
+            <div class="border-bottom border-dark mb-2">
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-2">${plant.name}</h4>
+                    <a href="/plants/${plant._id}" class="mb-2">View details</a>
+                    <button onclick="removePlant('${plant._id}');" href="/">Delete Plant</button>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <p class="mb-2">
+                        <i class="fa-solid fa-magnifying-glass align-middle" title="Date spotted"></i> 
+                        ${plant.time} - ${plant.date}
+                    </p>
+                    <p class="mb-2">
+                        <i class="fa-solid fa-user align-middle" title="User"></i> ${plant.uname}
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-dark mb-3" id="info-div-${plant._id}">
+                <div id="left-panel-${plant._id}">
+                    <div id="height-spread-sun-${plant._id}" class="d-flex">
+                        <i class="fa-solid fa-ruler-combined" title="Plant spread and height in centimetres"></i>
+                        <p class="ml-2 mr-3 align-middle">${plant.spread}x${plant.height}cm</p>
+                        <p class="mr-1">
+                            <i class="fa-solid fa-cloud-sun align-middle" title="Sun coverage"></i> ${plant.sun}
+                        </p>
+                    </div>
+                    <div class="mb-1">
+                        <div class="icon-div d-flex" id="icons-${plant._id}">
+                            <i class="fa-solid fa-leaf" title="${plant.leaves ? "Has": "Does not have"} leaves" 
+                                style="color: ${plant.leaves ? "#000000": "#9e9e9e"}"></i>
+                            <i class="fa-solid fa-lemon" title="${plant.fruit ? "Bears": "Does not bear"} fruit" 
+                                style="color: ${plant.fruit ? "#000000": "#9e9e9e"}"></i>
+                            <i class="fa-solid fa-seedling" title="${plant.seeds ? "Has": "Does not have"} seeds" 
+                                style="color: ${plant.seeds ? "#000000": "#9e9e9e"}"></i>
+                            <i class="vs vs-flower" title="${plant.flowers ? "Has": "Does not have"} flowers" 
+                                style="color: ${plant.flowers ? "#000000": "#9e9e9e"}"></i>
+                        </div>
+                        ${plant.flowers ? `
+                            <div class="d-flex">
+                                <p class="mb-0">${plant.flower_colour}</p>
+                                <i class="fa-solid fa-palette align-middle" title="Flower colour" 
+                                    style="color: ${plant.flowers ? "#000000": '#9e9e9e'}"></i>
+                            </div>` : ''}
+                    </div>
+                </div>
+                <div id="right-panel" class="mb-2">
+                    <img src="${plant.photo}" class="mw-100" id="photo-${plant._id}">
+                </div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <i class="fa-solid fa-book-atlas align-middle" title="View on DBPedia"></i>
+                    <a href="${plant.dbpedia}" target="_blank">View on DBPedia</a>
+                </div>
+                <p>
+                    <i class="fa-regular fa-id-card align-middle" title="Identification status"></i> ${plant.identification}
+                </p>
+                <script>
+                    fixFormat("${plant._id}");
+                </script>
+            </div>
+        `;
+
+        // Append the constructed div to the container
+        container.appendChild(div);
+    }
+};
+
+
 
 // var plants = require('../../controllers/plants');
 // var comments = require('../../controllers/comments');
 
-
-window.onload = function () {
+document.addEventListener("DOMContentLoaded", function() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js', {scope: '/'})
             .then(function (reg) {
@@ -30,7 +116,7 @@ window.onload = function () {
                 if (permission === "granted") {
                     navigator.serviceWorker.ready
                         .then(function (serviceWorkerRegistration) {
-                            serviceWorkerRegistration.showNotification("Todo App",
+                            serviceWorkerRegistration.showNotification("Plantpedia",
                                 {body: "Notifications are enabled!"})
                                 .then(r =>
                                     console.log(r)
@@ -41,14 +127,15 @@ window.onload = function () {
         }
     }
     if (navigator.onLine) {
-        fetch('http://localhost:3000/todos')
+        console.log('Online mode')
+        fetch('http://localhost:3000/plants')
             .then(function (res) {
                 return res.json();
-            }).then(function (newTodos) {
-            openTodosIDB().then((db) => {
-                insertTodoInList(db, newTodos)
-                deleteAllExistingTodosFromIDB(db).then(() => {
-                    addNewTodosToIDB(db, newTodos).then(() => {
+            }).then(function (newPlants) {
+            openPlantsIDB().then((db) => {
+                insertPlantInList(db, newPlants)
+                deleteAllExistingPlantsFromIDB(db).then(() => {
+                    addNewPlantsToIDB(db, newPlants).then(() => {
                         console.log("All new todos added to IDB")
                     })
                 });
@@ -57,17 +144,17 @@ window.onload = function () {
 
     } else {
         console.log("Offline mode")
-        openTodosIDB().then((db) => {
-            getAllTodos(db).then((todos) => {
-                for (const todo of todos) {
-                    insertTodoInList(todo)
+        openPlantsIDB().then((db) => {
+            getAllPlants(db).then((plants) => {
+                for (const plant of plants) {
+                    insertPlantInList(plant)
                 }
             });
         });
 
     }
 
-}
+});
 
 function init() {
     //Create user info - unique name and function to add message to history when sent

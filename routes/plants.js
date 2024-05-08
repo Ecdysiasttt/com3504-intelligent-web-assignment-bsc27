@@ -18,6 +18,8 @@ var storage = multer.diskStorage({
 });
 let upload = multer( { storage: storage });
 
+
+
 router.get('/add', function(req, res, next) {
   res.render('add', {
     title: 'Add new plant sighting',
