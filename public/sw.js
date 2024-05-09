@@ -6,7 +6,7 @@ const staticAssets = [
     "/src/index.ejs",
     '/views/app.js',
     '/javascripts/index.js',
-    '/javascripts/index.js',
+    '/javascripts/index.js', //Should this be /index.js and not /javascripts/index.js again? Or insert.js?
     '/images/seed-icon.png',
     '/public/stylesheets/style.css',
     '404.html',

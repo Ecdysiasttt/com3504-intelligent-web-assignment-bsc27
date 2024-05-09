@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var plants = require('../controllers/plants');
 
-//TODO =============== THIS NEEDS DEFINING - THERE IS NO SUCH FILE =============== //
+
 var todoController = require('../controllers/todo');
 
 

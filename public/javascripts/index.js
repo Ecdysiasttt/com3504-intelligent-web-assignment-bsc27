@@ -97,64 +97,64 @@ const insertPlantInList = (plant) => {
 // var plants = require('../../controllers/plants');
 // var comments = require('../../controllers/comments');
 
-document.addEventListener("DOMContentLoaded", function() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js', {scope: '/'})
-            .then(function (reg) {
-                console.log('Service Worker Registered!', reg);
-            })
-            .catch(function (err) {
-                console.log('Service Worker registration failed: ', err);
-            });
-    }
-
-    // Asks for permissions from the user
-    if ("Notification" in window) {
-        if (Notification.permission === "granted") {
-        } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(function (permission) {
-                if (permission === "granted") {
-                    navigator.serviceWorker.ready
-                        .then(function (serviceWorkerRegistration) {
-                            serviceWorkerRegistration.showNotification("Plantpedia",
-                                {body: "Notifications are enabled!"})
-                                .then(r =>
-                                    console.log(r)
-                                );
-                        });
-                }
-            });
-        }
-    }
-    if (navigator.onLine) {
-        console.log('Online mode')
-        fetch('http://localhost:3000/plants')
-            .then(function (res) {
-                return res.json();
-            }).then(function (newPlants) {
-            openPlantsIDB().then((db) => {
-                insertPlantInList(db, newPlants)
-                deleteAllExistingPlantsFromIDB(db).then(() => {
-                    addNewPlantsToIDB(db, newPlants).then(() => {
-                        console.log("All new todos added to IDB")
-                    })
-                });
-            });
-        });
-
-    } else {
-        console.log("Offline mode")
-        openPlantsIDB().then((db) => {
-            getAllPlants(db).then((plants) => {
-                for (const plant of plants) {
-                    insertPlantInList(plant)
-                }
-            });
-        });
-
-    }
-
-});
+// document.addEventListener("DOMContentLoaded", function() {
+//     if ('serviceWorker' in navigator) {
+//         navigator.serviceWorker.register('/sw.js', {scope: '/'})
+//             .then(function (reg) {
+//                 console.log('Service Worker Registered!', reg);
+//             })
+//             .catch(function (err) {
+//                 console.log('Service Worker registration failed: ', err);
+//             });
+//     }
+//
+//     // Asks for permissions from the user
+//     if ("Notification" in window) {
+//         if (Notification.permission === "granted") {
+//         } else if (Notification.permission !== "denied") {
+//             Notification.requestPermission().then(function (permission) {
+//                 if (permission === "granted") {
+//                     navigator.serviceWorker.ready
+//                         .then(function (serviceWorkerRegistration) {
+//                             serviceWorkerRegistration.showNotification("Plantpedia",
+//                                 {body: "Notifications are enabled!"})
+//                                 .then(r =>
+//                                     console.log(r)
+//                                 );
+//                         });
+//                 }
+//             });
+//         }
+//     }
+//     if (navigator.onLine) {
+//         console.log('Online mode')
+//         fetch('http://localhost:3000/plants')
+//             .then(function (res) {
+//                 return res.json();
+//             }).then(function (newPlants) {
+//             openPlantsIDB().then((db) => {
+//                 insertPlantInList(db, newPlants)
+//                 deleteAllExistingPlantsFromIDB(db).then(() => {
+//                     addNewPlantsToIDB(db, newPlants).then(() => {
+//                         console.log("All new todos added to IDB")
+//                     })
+//                 });
+//             });
+//         });
+//
+//     } else {
+//         console.log("Offline mode")
+//         openPlantsIDB().then((db) => {
+//             getAllPlants(db).then((plants) => {
+//                 for (const plant of plants) {
+//                     insertPlantInList(plant)
+//                 }
+//             });
+//         });
+//
+//     }
+//
+// });
 
 function init() {
     //Create user info - unique name and function to add message to history when sent
@@ -183,7 +183,7 @@ function setMapClickable(){
         var lat = e.latlng.lat;
         var lng = e.latlng.lng;
 
-        marker.setLatLng([lat, lng]);
+        setMarker(lat, lng);
 
         document.getElementById("latitude").value = lat.toFixed(6);
         document.getElementById("longitude").value = lng.toFixed(6);
@@ -261,11 +261,11 @@ function toggleComments(chatId, uname) {
     }
 }
 
-function writeOnHistory(text, test) {
+function writeOnHistory(text, id) {
     //TODO - Not loading history correctly? Comments only appear after opening for first time (reloading page deletes all message history)
     //Might be something to do with DB...
 
-    let history = document.getElementById('history-' + test.toString());
+    let history = document.getElementById('history-' + id.toString());
     let paragraph = document.createElement('p');
     paragraph.innerHTML = text;
     history.appendChild(paragraph);
@@ -334,6 +334,45 @@ function addCommentToPlantDB(plantID, comment) {
     }).catch(error => {
         console.log('Error fetching post for comment:', error);
     });
+}
+
+
+function loadComments(plantID){
+    fetch(`/plants/${plantID}/comments`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch comments');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const comments = data.comments;
+            const chatId = data.chatId;
+            let history = document.getElementById('history-' + plantID.toString());
+            comments.forEach(comment => {
+                writeOnHistory(`${comment.userId}: ${comment.text}`, chatId);
+                console.log('Comment added to history');
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching comments:', error);
+        });
+
 
 
 }
+
+//This is still being called for some reason?
+// console.log('here');
+// //TODO set the history for the plant to have the comments from the database (and connect to the room?)
+// fetch(`/plants/${plantID}/comments`, {
+//     method: 'get'
+// }).then(response => {
+//     if (response.ok) {
+//         console.log('Got comments');
+//     } else {
+//         console.log('Could not fetch comments');
+//     }
+// }).catch(error => {
+//     console.log('Error fetching comments:', error);
+// });

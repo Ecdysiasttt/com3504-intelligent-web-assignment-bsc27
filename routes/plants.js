@@ -134,6 +134,49 @@ router.post('/:plantId/comments', async function (req, res, next) {
 
 });
 
+
+// router.get('/:plantId/comments', async function(req, res, next) {
+//   const id = req.params.plantId;
+//   const plant = await Plant.findById(id);
+//   // const jsonPlant = JSON.parse(plant);
+//   //
+//   // const comments = [];
+//   //
+//   const plantComments = plant.comments;
+//   //
+//   console.log(plantComments);
+//
+//   let chatId = plant.chatId;
+//
+//   let history = document.getElementById('history-' + chatId.toString());
+//   let paragraph = document.createElement('p-' + chatId.toString());
+//   plantComments.forEach(comment => {
+//     let text = comment.text;
+//     let userId = comment.userId;
+//
+//     paragraph.innerHTML = userId + ':' + text;
+//     history.appendChild(paragraph);
+//   });
+// });
+
+
+router.get('/:plantId/comments', async function(req, res, next) {
+  try {
+    const id = req.params.plantId;
+    const plant = await Plant.findById(id);
+    const plantComments = plant.comments;
+    const plantChatId = plant.chatId;
+    console.log('Found plant and comments')
+
+    res.json({ success: true, comments: plantComments , chatId: plantChatId});
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch comments', error: error.message });
+  }
+});
+
+
+
+
 async function checkIdValid (chatID) {
   var allPlants = await plants.getAll();
   var allPlantsJSON = JSON.parse(allPlants);
