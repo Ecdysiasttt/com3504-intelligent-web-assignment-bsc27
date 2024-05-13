@@ -11,12 +11,12 @@
 
         <script src="https://kit.fontawesome.com/7f6de5401f.js" crossorigin="anonymous"></script>
         <script src="../javascripts/index.js"></script>
-<!--        <script src="javascripts/idb-utility.js"></script>-->
+        <script src="../javascripts/idb-utility.js"></script>
         <script src = "https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     </head>
 
-    <body class="p-3" onload="loadMap(); console.log('Loaded.'); setMapClickable();">
+    <body class="p-3" onload="loadMap(); setMapClickable();">
         <header class="d-flex justify-content-between align-items-center border-bottom border-dark mb-4">
             <h1><a href="/" class="text-reset text-decoration-none"><%= site_name %></a></h1>
             <a href="/plants/add" class="text-reset text-decoration-none btn btn-outline-dark">Add plant sighting</a>
@@ -66,12 +66,21 @@
                 <hr>
 
                 <div class="form-group">
-                    <label for="">Location:</label>
-                    <div id="map"></div>
-                    <input type="text" id="latitude" name="latitude" placeholder="Latitude" required>
-                    <input type="text" id="longitude" name="longitude" placeholder="Longitude" required>
-                    <button onclick="getLocation(event);">Get Location </button>
-                    <button onclick="setAtGetMapPos(event)">Re-Centre view</button>
+<!--                    <label for="">Location:</label>-->
+<!--                    <div id="map"></div>-->
+<!--                    <input type="text" id="latitude" name="latitude" placeholder="Latitude" required>-->
+<!--                    <input type="text" id="longitude" name="longitude" placeholder="Longitude" required>-->
+<!--                    <button onclick="getLocation(event);">Get Location </button>-->
+<!--                    <button onclick="setAtGetMapPos(event)">Re-Centre view</button>-->
+                    <div>
+                        <h6>Location:</h6>
+                        <div id="map"></div>
+                        <input type="text" id="latitude" name="latitude" placeholder="Latitude" required>
+                        <input type="text" id="longitude" name="longitude" placeholder="Longitude" required>
+                        <button onclick="getLocation(event);">Get Location </button>
+                        <button onclick="setAtGetMapPos(event);">Re-Centre view</button>
+                    </div>
+
                 </div>
 
                 <hr>

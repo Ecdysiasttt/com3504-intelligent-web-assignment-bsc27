@@ -1,7 +1,7 @@
 let name = null;
 let roomNo = null;
 // let socket = io();
-
+//
 let socket;
 
 if (typeof io === "function") {
@@ -12,8 +12,8 @@ if (typeof io === "function") {
 
 let rooms = [];
 // let map = null;
-var marker;
-var map;
+let marker;
+let map;
 
 const insertPlantInList = (plant) => {
     if (plant.name) {
@@ -316,7 +316,8 @@ function removePlant(id){
 function addCommentToPlantDB(plantID, comment) {
 
     const requestBody = {
-        text: comment
+        text: comment,
+        user: name
     };
     fetch(`/plants/${plantID}/comments`, {
         method: 'post',
@@ -350,8 +351,8 @@ function loadComments(plantID){
             const chatId = data.chatId;
             let history = document.getElementById('history-' + plantID.toString());
             comments.forEach(comment => {
-                writeOnHistory(`${comment.userId}: ${comment.text}`, chatId);
-                console.log('Comment added to history');
+                writeOnHistory(`<b> ${comment.userId}: </b> ${comment.text}`, chatId);
+                // console.log('Comment added to history');
             });
         })
         .catch(error => {

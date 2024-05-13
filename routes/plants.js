@@ -67,6 +67,8 @@ router.post('/add', upload.single('photo'), async function(req, res, next) {
 });
 
 router.get('/:plantId', async function (req, res, next) {
+
+
   try {
     var plantId = req.params.plantId;
 
@@ -77,14 +79,54 @@ router.get('/:plantId', async function (req, res, next) {
 
     var thisPlant = allPlantsJSON.find(plant => plant._id === plantId);
 
-    res.render('plant', {
-      plant: thisPlant
-    });
+    // Retrieve data from DBpedia resource
+    const resource = 'http://dbpedia.org/resource/' + thisPlant.name;
+
+    // const resource = 'http://dbpedia.org/resource/Paris';
+
+    // SPARQL query
+    const endpointUrl = 'https://dbpedia.org/sparql';
+    const sparqlQuery = `
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX dbo: <http://dbpedia.org/ontology/>
+
+    SELECT ?label ?plant
+    WHERE {
+      <${resource}> rdfs:label ?label .
+      <${resource}> dbo:plant ?plant .
+    FILTER (langMatches(lang(?label), "en")) .
+    }`;
+
+    const encodedQuery = encodeURIComponent(sparqlQuery);
+
+    const url = `${endpointUrl}?query=${encodedQuery}&format=json`;
+
+    // Retrieve data by fetch
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          let bindings = data.results.bindings;
+          let result = JSON.stringify(bindings);
+
+          // Render the result in plant.ejs
+          res.render('plant', {
+            // title: bindings[0].label.value,
+            // plantDB: bindings[0].plant.value,
+            plant: thisPlant,
+            JSONresult: result
+          });
+        });
+
+    // res.render('plant', {
+    //   plant: thisPlant
+    // });
   } catch (error) {
     // Handle any errors
     next(error);
   }
 });
+
+
 
 
 router.delete('/:plantId', async function (req, res, next) {
@@ -104,7 +146,10 @@ router.delete('/:plantId', async function (req, res, next) {
 router.post('/:plantId/comments', async function (req, res, next) {
 
   const plantId = req.params.plantId;
-  const { text } = req.body;
+  const { text, user } = req.body;
+
+  console.log(text);
+  console.log(user);
 
   try {
 
@@ -112,7 +157,7 @@ router.post('/:plantId/comments', async function (req, res, next) {
     const plant = await Plant.findById(plantId);
 
     const newComment = {
-      userId: 1,
+      userId: user,
       text: text
     };
 
@@ -135,29 +180,6 @@ router.post('/:plantId/comments', async function (req, res, next) {
 });
 
 
-// router.get('/:plantId/comments', async function(req, res, next) {
-//   const id = req.params.plantId;
-//   const plant = await Plant.findById(id);
-//   // const jsonPlant = JSON.parse(plant);
-//   //
-//   // const comments = [];
-//   //
-//   const plantComments = plant.comments;
-//   //
-//   console.log(plantComments);
-//
-//   let chatId = plant.chatId;
-//
-//   let history = document.getElementById('history-' + chatId.toString());
-//   let paragraph = document.createElement('p-' + chatId.toString());
-//   plantComments.forEach(comment => {
-//     let text = comment.text;
-//     let userId = comment.userId;
-//
-//     paragraph.innerHTML = userId + ':' + text;
-//     history.appendChild(paragraph);
-//   });
-// });
 
 
 router.get('/:plantId/comments', async function(req, res, next) {
@@ -166,7 +188,6 @@ router.get('/:plantId/comments', async function(req, res, next) {
     const plant = await Plant.findById(id);
     const plantComments = plant.comments;
     const plantChatId = plant.chatId;
-    console.log('Found plant and comments')
 
     res.json({ success: true, comments: plantComments , chatId: plantChatId});
   } catch (error) {

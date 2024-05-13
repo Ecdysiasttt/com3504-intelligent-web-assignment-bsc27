@@ -12,12 +12,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src = "https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    <script src="javascripts/index.js"></script>
+    <script src="../javascripts/index.js"></script>
 <!--    <script src="public/javascripts/idb-utility.js"></script>-->
 
 </head>
 
-<body class="p-3" onload="init(); console.log('banana'); loadComments('<%= plant._id%>'); loadMap(); setMarker('<%= plant.latitude%>', '<%= plant.longitude%>'); setMapView(null, '<%= plant.latitude%>', '<%= plant.longitude%>');">
+<body class="p-3" onload="init(); loadComments('<%= plant._id%>'); loadMap(); setMarker('<%= plant.latitude%>', '<%= plant.longitude%>'); setMapView(null, '<%= plant.latitude%>', '<%= plant.longitude%>');">
 <header class="d-flex justify-content-between align-items-center border-bottom border-dark mb-4">
     <h1><a href="/" class="text-reset text-decoration-none">Plantpedia</a></h1>
     <a href="/" class="text-reset text-decoration-none btn btn-outline-dark">Return home</a>
@@ -33,18 +33,26 @@
 
     <!--Render DBpedia results-->
     <h1><%= plant.name%></h1>
-    <p>Plant: <%= plant %></p>
-    <p>JSON result: <%= JSONresult%></p>
+    <% try { %>
+        <% var resultObj = JSON.parse(JSONresult); %>
+        <% if (resultObj && Object.keys(resultObj).length > 0) { %>
+            <pre><%= JSON.stringify(resultObj, null, 2) %></pre>
+        <% } else { %>
+            <p>No DBpedia result could be found.</p>
+        <% } %>
+    <% } catch (error) { %>
+        <p>Error: <%= error.message %></p>
+    <% } %>
 
     <div>
         <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2">
             <!--                        meta-info: name, found by, found on... -->
             <div class="border-bottom border-dark mb-2">
                 <!--                            <i class="fa-solid fa-file-signature align-middle"></i>-->
-                <div class="d-flex justify-content-between">
-                    <h4 class="mb-2"><%= plant.name %></h4> <!--plant name-->
+<!--                <div class="d-flex justify-content-between">-->
+<!--                    <h4 class="mb-2"><%= plant.name %></h4> &lt;!&ndash;plant name&ndash;&gt;-->
                     <!--                                    <a href="/plants/test"> View details</a>-->
-                </div>
+<!--                </div>-->
                 <!--                            <h4 class="mb-2"><%= plant.name %></h4> &lt;!&ndash;plant name&ndash;&gt;-->
 
                 <div class="d-flex justify-content-between">
