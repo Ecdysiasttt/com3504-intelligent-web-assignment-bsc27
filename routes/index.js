@@ -59,7 +59,7 @@ router.post('/add-todo', function(req, res, next) {
 
 
 
-  // Knowledge graph from DBpedia
+  /* Knoweldge Graph of plant from DBpedia */
 
   // Create a new GET route for plant
 router.get('/' + plant.name, function (req, res, next) {
