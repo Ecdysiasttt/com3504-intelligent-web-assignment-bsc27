@@ -91,10 +91,10 @@ router.get('/' + plant.name, function (req, res, next) {
         let bindings = data.results.bindings;
         let result = JSON.stringify(bindings);
 
-        // Render the result in ejs
+        // Render the result in plant.ejs
         res.render('plant', {
           title: bindings[0].label.value,
-          country: bindings[0].plant.value,
+          plant: bindings[0].plant.value,
           JSONresult: result
         });
       });
