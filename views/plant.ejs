@@ -17,7 +17,7 @@
 
 </head>
 
-<body class="p-3" onload="init(); loadComments('<%= plant._id%>'); loadMap(); setMarker('<%= plant.latitude%>', '<%= plant.longitude%>'); setMapView(null, '<%= plant.latitude%>', '<%= plant.longitude%>');">
+<body class="p-3" onload="init(); loadComments('<%= plant._id%>'); loadMap(); setMarker('<%= plant.latitude%>', '<%= plant.longitude%>'); setMapView(null, '<%= plant.latitude%>', '<%= plant.longitude%>');connectToRoom('<%= plant.chatId%>');">
 <header class="d-flex justify-content-between align-items-center border-bottom border-dark mb-4">
     <h1><a href="/" class="text-reset text-decoration-none">Plantpedia</a></h1>
     <a href="/" class="text-reset text-decoration-none btn btn-outline-dark">Return home</a>
@@ -158,7 +158,7 @@
                                 <p>
                                     <label for="name"> Comment: </label>
                                     <input type="text" id="chat_input" name="chat_input" style="width: 80%">
-                                    <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); addCommentToPlantDB('<%= plant._id%>', chat_input.value); chat_input.value = ''">Send</button>
+                                    <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>'); sendChatText(chat_input, '<%= plant.chatId%>'); addCommentToPlantDB('<%= plant._id%>', chat_input.value); chat_input.value = ''">Send</button>
                                 </p>
                             </form>
                         </div>
