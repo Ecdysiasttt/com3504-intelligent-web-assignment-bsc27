@@ -36,7 +36,7 @@
 
 
 ## Credits:
-Oliver Spacey - ohmspacey1@sheffield.ac.uk
-Harry Scutt - hasscutt1@sheffield.ac.uk
-Wan Chi Leung - wcleung1@sheffield.ac.uk
+<p>Oliver Spacey - ohmspacey1@sheffield.ac.uk</p>
+<p>Harry Scutt - hasscutt1@sheffield.ac.uk</p>
+<p>Wan Chi Leung - wcleung1@sheffield.ac.uk</p>
 
