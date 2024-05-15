@@ -1,4 +1,5 @@
 importScripts('/javascripts/idb-utility.js');
+let mustSync = false;
 
 const staticAssets = [
     "/",
@@ -54,7 +55,6 @@ self.addEventListener('fetch', function (event) {
 
     const isOnline = navigator.onLine;
 
-    let mustSync = false;
 
     if (isOnline){
 
