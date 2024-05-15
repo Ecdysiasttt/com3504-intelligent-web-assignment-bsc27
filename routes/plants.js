@@ -272,5 +272,17 @@ async function checkIdValid (chatID) {
   }
 }
 
+// Route to get all plant IDs
+router.get('/api/plants/ids', async (req, res) => {
+  try {
+    const plants = await Plant.find({}, '_id'); // Fetch only the _id field
+    const plantIds = plants.map(plant => plant._id);
+    console.log('HEREAWRKASFLJASOIFNAS;OFMAOSFNAOSFMASLKFN')
+    res.json(plantIds);
+  } catch (error) {
+    res.status(500).send('Error fetching plant IDs');
+  }
+});
+
 
 module.exports = router;

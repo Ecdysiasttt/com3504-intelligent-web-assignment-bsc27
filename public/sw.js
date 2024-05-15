@@ -1,20 +1,17 @@
 importScripts('/javascripts/idb-utility.js');
 
+
 //  Install event: cache static assets when SW first installed
 const staticAssets = [
     "/",
-    "/src/index.ejs",
-    '/views/app.js',
+    '/plants/add',
     '/javascripts/index.js',
-    '/javascripts/index.js', //Should this be /index.js and not /javascripts/index.js again? Or insert.js?
-    '/images/seed-icon.png',
-    '/public/stylesheets/style.css',
-    '404.html',
-    'offline.html'
+    '/javascripts/insert.js', //Should this be /index.js and not /javascripts/index.js again? Or insert.js?
+    '/stylesheets/style.css'
 ];
 
 // add cacheversion
-let cacheVersion = 0;
+let cacheVersion = 1;
 let cacheName = `cache-v${cacheVersion}`;
 
 function increment() {
@@ -22,123 +19,78 @@ function increment() {
     cacheName = `cache-v${cacheVersion}`;
 }
 
+async function fetchPlantUrls() {
+    try {
+        const response = await fetch('/plants/api/plants/ids');
+        const plantIds = await response.json();
+        // console.log(plantIds)
+        return plantIds.map(id => `/plants/${id}`);
+    } catch (error) {
+        console.error('SW: Error fetching plant IDs', error);
+        return [];
+    }
+}
+
+async function fetchPlantComments(urls) {
+    const commentURLs = (await urls).map(url => url+'/comments');
+    console.log(commentURLs)
+    return commentURLs;
+}
+
 // Add cache
-self.addEventListener("install", (event) => {
-    console.log("SW Installing");
+self.addEventListener('install', event => {
+    console.log('Service Worker: Installing....');
     event.waitUntil((async () => {
-      console.log('SW: Caching App Shell at the moment...');
-      try {
-        const cache = await caches.open("static");
-        cache.addAll([
-          '/',
-          '/manifest.json',
-          '/javascripts/index.js',
-          // '/javascripts/insert.js',
-          '/javascripts/idb-utility.js',
-          '/stylesheets/style.css',
-          '/images/image_icon.png',
-          '/plants'
-        ]);
-        console.log('SW: App Shell cached');
-      }
-      catch {
-        console.log('error occurred while caching...');
-      }
+
+        //add the dynamic /plants/ routes
+
+        console.log('Service Worker: Caching App Shell at the moment......');
+        try {
+            increment();
+            const cache = await caches.open(cacheName);
+            const plantUrls = await fetchPlantUrls();
+            const plantComments = await fetchPlantComments(plantUrls);
+            await cache.addAll([...staticAssets, ...plantUrls, ...plantComments]);
+            console.log(`Added ${cacheName}`)
+        }
+        catch{
+            console.log("error occured while caching...")
+        }
+
     })());
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    (async () => {
-      const keys = await caches.keys();
-      return keys.map(async (cache) => {
-        if(cache !== "static") {
-          console.log('SW: Removing old cache: ' + cache);
-          return await caches.delete(cache);
-        }
-      })
-    })()
-  )
-});
 
-self.addEventListener('fetch', event => {
-  event.respondWith((async () => {
-    const cache = await caches.open("static");
-    const cachedResponse = await cache.match(event.request);
-    if (cachedResponse) {
-      console.log('SW: Fetching from cache: ', event.request.url);
-      return cachedResponse
-    }
-    console.log('SW: Fetching from URL: ', event.request.url);
-    return fetch(event.request);
-  })());
+// Fetch event: Serve from cache or fetch from network
+self.addEventListener('fetch', function(event) {
+
+    console.log('Service Worker: Fetch', event.request.url);
+
+    console.log("Url", event.request.url);
+
+    event.respondWith(
+        caches.match(event.request).then(function(response) {
+            return response || fetch(event.request);
+        })
+    );
 });
 
 
+// Activate event: Update when SW becomes active
+self.addEventListener("activate", (event) => {
+    console.log("New SW activating");
 
-// event.waitUntil(
-//   caches
-//     .open(cacheName)
-//     .then((cache) => {
-//       //Update version
-//       increment();
-//
-//       //add files to the cache
-//       return cache.addAll(staticAssets);
-//     })
-//     .catch((error) => console.log(error))
-// );
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((storedCacheName) => {
+                    if (storedCacheName !== cacheName) {
+                        console.log('Deleting cache:', storedCacheName)
+                        return caches.delete(storedCacheName);
+                    }
+                })
+            );
+        })
+    );
+});
 
-// // Activate event: Update when SW becomes active
-// self.addEventListener("activate", (event) => {
-//     console.log("New SW activating");
-//
-//     event.waitUntil(
-//         caches.keys().then((cacheNames) => {
-//             return Promise.all(
-//                 cacheNames.map((storedCacheName) => {
-//                     if (storedCacheName !== cacheName) {
-//                         return caches.delete(storedCacheName);
-//                     }
-//                 })
-//             );
-//         })
-//     );
-// });
-
-
-// Fetch event: allow SW to intercept the request
-// self.addEventListener("fetch", (event) => {
-//     console.log("Fetch", event.request.url);
-//
-//     event.respondWith(
-//         caches
-//             .match(event.request)
-//             .then((response) => {
-//                 if (response) {
-//                     console.log("Found ", event.request.url, " in cache");
-//                     return response;
-//                 }
-//                 return fetch(event.request).then((response) => {
-//                     if (response.status === 404) {
-//                         return caches.open(cacheName).then((cache) => {
-//                             return cache.match("404.html");
-//                         });
-//                     }
-//
-//                     return caches.open(cacheName).then((cache) => {
-//                         cache.put(event.request.url, response.clone());
-//                         return response;
-//                     });
-//                 });
-//             })
-//
-//             // Error
-//             .catch(async (error) => {
-//                 console.log("Error, ", error);
-//                 return caches.open(cacheName).then((cache) => {
-//                     return cache.match("offline.html");
-//                 });
-//             })
-//     );
-// });
