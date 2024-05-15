@@ -191,11 +191,15 @@ router.get('/:plantId', async function (req, res, next) {
 
 router.delete('/:plantId', async function (req, res, next) {
   const { plantId } = req.params;
+
+  console.log('Trying to delete plant:', plantId);
+
   try {
 
     const deletedPlant = await plants.remove(plantId);
 
     res.json({ message: 'Plant removed successfully', deletedPlant });
+    console.log('Plant removed successfully');
   } catch (error) {
 
     next(error);
@@ -221,12 +225,19 @@ router.post('/:plantId/comments', async function (req, res, next) {
       text: text
     };
 
-    if(plant.comments == null){
-      plant.comments = [newComment]; //Initialise comments if none exist.
-    } else {
-      plant.comments.push(newComment); //Add to existing array if comments exists.
+    // if(plant.comments == null){
+    //   plant.comments = [newComment]; //Initialise comments if none exist.
+    // } else {
+    //   plant.comments.push(newComment); //Add to existing array if comments exists.
+    // }
+
+    try {
+      plant.comments.push(newComment);
+    } catch {
+      plant.comments = [newComment];
     }
 
+    console.log('Saving...')
     await plant.save();
 
     console.log('Successfully added comment');
@@ -248,6 +259,8 @@ router.get('/:plantId/comments', async function(req, res, next) {
     const plant = await Plant.findById(id);
     const plantComments = plant.comments;
     const plantChatId = plant.chatId;
+
+    console.log(plantComments);
 
     res.json({ success: true, comments: plantComments , chatId: plantChatId});
   } catch (error) {

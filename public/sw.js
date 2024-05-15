@@ -1,21 +1,18 @@
 importScripts('/javascripts/idb-utility.js');
 
-
-//  Install event: cache static assets when SW first installed
 const staticAssets = [
     "/",
     '/plants/add',
     '/javascripts/index.js',
-    '/javascripts/insert.js', //Should this be /index.js and not /javascripts/index.js again? Or insert.js?
+    '/javascripts/insert.js',
     '/stylesheets/style.css'
 ];
 
-// add cacheversion
 let cacheVersion = 1;
 let cacheName = `cache-v${cacheVersion}`;
 
 function increment() {
-    cacheVersion ++;
+    cacheVersion++;
     cacheName = `cache-v${cacheVersion}`;
 }
 
@@ -23,7 +20,6 @@ async function fetchPlantUrls() {
     try {
         const response = await fetch('/plants/api/plants/ids');
         const plantIds = await response.json();
-        // console.log(plantIds)
         return plantIds.map(id => `/plants/${id}`);
     } catch (error) {
         console.error('SW: Error fetching plant IDs', error);
@@ -32,19 +28,14 @@ async function fetchPlantUrls() {
 }
 
 async function fetchPlantComments(urls) {
-    const commentURLs = (await urls).map(url => url+'/comments');
-    console.log(commentURLs)
+    const commentURLs = (await urls).map(url => url + '/comments');
     return commentURLs;
 }
 
-// Add cache
 self.addEventListener('install', event => {
     console.log('Service Worker: Installing....');
     event.waitUntil((async () => {
-
-        //add the dynamic /plants/ routes
-
-        console.log('Service Worker: Caching App Shell at the moment......');
+        console.log('Service Worker: Caching App Shell...');
         try {
             increment();
             const cache = await caches.open(cacheName);
@@ -52,34 +43,49 @@ self.addEventListener('install', event => {
             const plantComments = await fetchPlantComments(plantUrls);
             await cache.addAll([...staticAssets, ...plantUrls, ...plantComments]);
             console.log(`Added ${cacheName}`)
+        } catch {
+            console.log("Error occurred while caching...")
         }
-        catch{
-            console.log("error occured while caching...")
-        }
-
     })());
 });
 
+self.addEventListener('fetch', function (event) {
 
-// Fetch event: Serve from cache or fetch from network
-self.addEventListener('fetch', function(event) {
 
-    console.log('Service Worker: Fetch', event.request.url);
+    const isOnline = navigator.onLine;
 
-    console.log("Url", event.request.url);
+    let mustSync = false;
 
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
+    if (isOnline){
+
+        if (mustSync){
+            // Check if IndexedDB contains offline changes
+            // If not empty, sync data with MongoDB and clear IndexedDB
+            mustSync = false;
+        }
+
+        event.respondWith(
+            fetch(event.request)
+        );
+    }
+    else{
+
+        mustSync = true;
+
+        // Check for POST requests and store them in IndexedDB
+        // Other requests are served from cache when offline
+
+        event.respondWith(
+            caches.match(event.request).then(function (response) {
+                return response;
+            })
+        );
+    }
+
 });
 
-
-// Activate event: Update when SW becomes active
 self.addEventListener("activate", (event) => {
     console.log("New SW activating");
-
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -93,4 +99,3 @@ self.addEventListener("activate", (event) => {
         })
     );
 });
-
