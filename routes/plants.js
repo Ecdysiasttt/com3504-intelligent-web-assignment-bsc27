@@ -33,6 +33,8 @@ router.get('/add', function(req, res, next) {
 
 /* POST plant add form */
 router.post('/add', upload.single('photo'), async function(req, res, next) {
+
+  console.log('Attempting to add plant')
   let userData = req.body;
   let filePath = req.file.path;
   console.log(userData.dateTime);
@@ -80,9 +82,9 @@ router.get('/:plantId', async function (req, res, next) {
     var thisPlant = allPlantsJSON.find(plant => plant._id === plantId);
 
     // Retrieve data from DBpedia resource
-    const resource = 'http://dbpedia.org/resource/' + thisPlant.name;
+    // const resource = 'http://dbpedia.org/resource/' + thisPlant.name;
 
-    // const resource = 'http://dbpedia.org/resource/Paris';
+    const resource = 'http://dbpedia.org/resource/Paris';
 
     // SPARQL query
     const endpointUrl = 'https://dbpedia.org/sparql';
@@ -93,7 +95,7 @@ router.get('/:plantId', async function (req, res, next) {
     SELECT ?label ?plant
     WHERE {
       <${resource}> rdfs:label ?label .
-      <${resource}> dbo:plant ?plant .
+      <${resource}> dbo:country ?country .
     FILTER (langMatches(lang(?label), "en")) .
     }`;
 
