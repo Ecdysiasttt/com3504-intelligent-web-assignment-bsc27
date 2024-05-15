@@ -21,16 +21,20 @@ function increment() {
 
 async function fetchPlantUrls() {
     try {
-        console.log(1)
         const response = await fetch('/plants/api/plants/ids');
-        console.log(response)
         const plantIds = await response.json();
-        console.log(plantIds)
+        // console.log(plantIds)
         return plantIds.map(id => `/plants/${id}`);
     } catch (error) {
         console.error('SW: Error fetching plant IDs', error);
         return [];
     }
+}
+
+async function fetchPlantComments(urls) {
+    const commentURLs = (await urls).map(url => url+'/comments');
+    console.log(commentURLs)
+    return commentURLs;
 }
 
 // Add cache
@@ -45,7 +49,8 @@ self.addEventListener('install', event => {
             increment();
             const cache = await caches.open(cacheName);
             const plantUrls = await fetchPlantUrls();
-            await cache.addAll([...staticAssets, ...plantUrls]);
+            const plantComments = await fetchPlantComments(plantUrls);
+            await cache.addAll([...staticAssets, ...plantUrls, ...plantComments]);
             console.log(`Added ${cacheName}`)
         }
         catch{
