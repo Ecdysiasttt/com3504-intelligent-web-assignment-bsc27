@@ -177,18 +177,17 @@
                 <div>
                     <!--TODO - Fix comments history not being shown when user opens comments initially or reloads page -->
                     <!--TODO - Fix comments send to wrong plant if receiver opens new chatroom -->
-                    <i class="fa-regular fa-comments align-middle mr-2"
-                       title="Comments:"></i>
                     <button
                         onclick="toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');"
                         class="btn btn-primary"
-                    >View Comments</button>
+                    ><i class="fa-regular fa-comments align-middle mr-2"
+                        title="Comments:"></i> Comments</button>
                     <div id="chat_interface-<%= plant.chatId%>" style="display: none">
                         <div id="history-<%= plant.chatId%>" class="boxed"></div>
                         <div id="input" class="bottom boxed">
                             <form onsubmit="return false;" style="width: 100%">
                                 <p>
-                                    <label for="name"> Comment: </label>
+                                    <label for="name">Leave a comment: </label>
                                     <input type="text" id="chat_input" name="chat_input" style="width: 80%">
                                     <button
                                         id="chat_send"
