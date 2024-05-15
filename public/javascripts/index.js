@@ -15,15 +15,6 @@ let rooms = [];
 let marker;
 let map;
 
-if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.register('/sw.js').then((registration) => {
-        console.log('Service worker registered:', registration.scope);
-    }).catch((error) => {
-        console.error('Service worker registration failed:', error);
-    });
-} else {
-    console.log('Background sync not supported');
-}
 
 const insertPlantInList = (plant) => {
     if (plant.name) {
@@ -173,6 +164,16 @@ function init() {
     socket.on('chat', function (chatId, userId, chatText) {
         writeOnHistory('<b>' + userId + ':</b> ' + chatText, chatId);
     });
+
+    //check if online. if online, save current plants to iDB
+
+    if (navigator.onLine){
+        //fetch plants from mongoDB
+        //store in iDB
+    } else{
+        //fetch plants from iDB
+        //use these instead
+    }
 
 }
 
@@ -324,6 +325,8 @@ function removePlant(id){
 
 
 function addCommentToPlantDB(plantID, comment) {
+
+    console.log('Fetching comment post...', comment)
 
     const requestBody = {
         text: comment,
