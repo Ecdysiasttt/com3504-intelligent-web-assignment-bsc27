@@ -19,8 +19,8 @@ jsonEntry = {
 
 
 router.get('/plants', function (req, res, next) {
-  plants.getAll().then(plant => {
-    console.log(plant);
+  plants.getAll().then(plants => {
+    console.log(plants);
     return res.status(200).send(plants);
   }).catch(err => {
     console.log(err);
@@ -47,15 +47,15 @@ router.get('/', function(req, res, next) {
 // route to get all todos
 
 //TODO =============== COMMENTING THESE OUT UNTIL TODOCONTROLLER IS ADDED =============== //
-router.get('/todos', function (req, res, next) {
-    todoController.getAll().then(todos => {
-        console.log(todos);
-        return res.status(200).send(todos);
-    }).catch(err => {
-        console.log(err);
-        res.status(500).send(err);
-    });
-})
+// router.get('/todos', function (req, res, next) {
+//     todoController.getAll().then(todos => {
+//         console.log(todos);
+//         return res.status(200).send(todos);
+//     }).catch(err => {
+//         console.log(err);
+//         res.status(500).send(err);
+//     });
+// })
 
 // route to add a new todo
 router.post('/add-todo', function(req, res, next) {

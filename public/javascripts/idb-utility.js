@@ -29,6 +29,8 @@ const addNewPlantsToIDB = (plantIDB, plants) => {
         const transaction = plantIDB.transaction(["plants"], "readwrite");
         const plantStore = transaction.objectStore("plants");
 
+        // console.log(plants);
+
         const addPromises = plants.map(plant => {
             return new Promise((resolveAdd, rejectAdd) => {
                 const addRequest = plantStore.add(plant);
@@ -36,9 +38,9 @@ const addNewPlantsToIDB = (plantIDB, plants) => {
                     console.log("Added " + "#" + addRequest.result + ": " + plant.name);
                     const getRequest = plantStore.get(addRequest.result);
                     getRequest.addEventListener("success", () => {
-                        console.log("Found " + JSON.stringify(getRequest.result));
+                        // console.log("Found " + JSON.stringify(getRequest.result));
                         // Assume insertPlantInList is defined elsewhere
-                        insertPlantInList(getRequest.result);
+                        // insertPlantInList(getRequest.result);
                         resolveAdd(); // Resolve the add promise
                     });
                     getRequest.addEventListener("error", (event) => {
@@ -69,10 +71,12 @@ const deleteAllExistingPlantsFromIDB = (plantIDB) => {
 
         clearRequest.addEventListener("success", () => {
             resolve();
+            console.log('Cleared.')
         });
 
         clearRequest.addEventListener("error", (event) => {
             reject(event.target.error);
+            console.log('Could not complete:', error);
         });
     });
 };

@@ -3,6 +3,8 @@ let roomNo = null;
 // let socket = io();
 //
 let socket;
+// var plants = require('../../controllers/plants');
+// var comments = require('../../controllers/comments');
 
 if (typeof io === "function") {
     socket = io();
@@ -17,6 +19,15 @@ let map;
 
 
 const insertPlantInList = (plant) => {
+    if (!plant) {
+        console.error('Plant data is undefined or null');
+        return;
+    }
+    if (!plant.name || !plant._id) {
+        console.error('Required properties missing in plant data:', plant);
+        return;
+    }
+
     if (plant.name) {
         const container = document.getElementById("plant-container");
 
@@ -93,70 +104,6 @@ const insertPlantInList = (plant) => {
     }
 };
 
-
-
-// var plants = require('../../controllers/plants');
-// var comments = require('../../controllers/comments');
-
-// document.addEventListener("DOMContentLoaded", function() {
-//     if ('serviceWorker' in navigator) {
-//         navigator.serviceWorker.register('/sw.js', {scope: '/'})
-//             .then(function (reg) {
-//                 console.log('Service Worker Registered!', reg);
-//             })
-//             .catch(function (err) {
-//                 console.log('Service Worker registration failed: ', err);
-//             });
-//     }
-//
-//     // Asks for permissions from the user
-//     if ("Notification" in window) {
-//         if (Notification.permission === "granted") {
-//         } else if (Notification.permission !== "denied") {
-//             Notification.requestPermission().then(function (permission) {
-//                 if (permission === "granted") {
-//                     navigator.serviceWorker.ready
-//                         .then(function (serviceWorkerRegistration) {
-//                             serviceWorkerRegistration.showNotification("Plantpedia",
-//                                 {body: "Notifications are enabled!"})
-//                                 .then(r =>
-//                                     console.log(r)
-//                                 );
-//                         });
-//                 }
-//             });
-//         }
-//     }
-//     if (navigator.onLine) {
-//         console.log('Online mode')
-//         fetch('http://localhost:3000/plants')
-//             .then(function (res) {
-//                 return res.json();
-//             }).then(function (newPlants) {
-//             openPlantsIDB().then((db) => {
-//                 insertPlantInList(db, newPlants)
-//                 deleteAllExistingPlantsFromIDB(db).then(() => {
-//                     addNewPlantsToIDB(db, newPlants).then(() => {
-//                         console.log("All new todos added to IDB")
-//                     })
-//                 });
-//             });
-//         });
-//
-//     } else {
-//         console.log("Offline mode")
-//         openPlantsIDB().then((db) => {
-//             getAllPlants(db).then((plants) => {
-//                 for (const plant of plants) {
-//                     insertPlantInList(plant)
-//                 }
-//             });
-//         });
-//
-//     }
-//
-// });
-
 function init() {
     //Create user info - unique name and function to add message to history when sent
     name = "User-" + Math.floor(Math.random() * 90000 + 100000);
@@ -173,6 +120,34 @@ function init() {
     } else{
         //fetch plants from iDB
         //use these instead
+    }
+
+    if (navigator.onLine) {
+        console.log('Online mode')
+        fetch('http://localhost:3000/plants')
+            .then(function (res) {
+                return res.json();
+            }).then(function (newPlants) {
+            openPlantsIDB().then((db) => {
+                // console.log(newPlants);
+                deleteAllExistingPlantsFromIDB(db).then(() => {
+                    addNewPlantsToIDB(db, newPlants).then(() => {
+                        console.log("All new plants added to IDB")
+                    })
+                });
+            });
+        });
+
+    } else {
+        console.log("Offline mode")
+        // openPlantsIDB().then((db) => {
+        //     getAllPlants(db).then((plants) => {
+        //         for (const plant of plants) {
+        //             insertPlantInList(plant)
+        //         }
+        //     });
+        // });
+
     }
 
 }
