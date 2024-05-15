@@ -38,7 +38,7 @@
               var infoContainer = document.getElementById('info-div-' + plantID);
 
               // set photo width to 35% (was 100% before)
-              photo.style.width = "35%";
+              photo.style.width = "100%";
 
               infoContainer.style.flexDirection = "column-reverse";
 
@@ -69,9 +69,15 @@
         <!--                            <i class="fa-solid fa-file-signature align-middle"></i>-->
                             <div class="d-flex justify-content-between">
                                 <h4 class="mb-2"><%= plant.name %></h4> <!--plant name-->
-                                <a href="/plants/<%= plant._id %>" class="mb-2">View details</a>
+<!--                                <a href="/plants/<%= plant._id %>" class="mb-2">View details</a>-->
         <!--                                    <a href="/plants/test"> View details</a>-->
-                                <button onclick="removePlant('<%= plant._id%>');" href="/">Delete Plant</button>
+<!--                                <button onclick="removePlant('<%= plant._id%>');" href="/" class="btn btn-outline-danger">-->
+<!--                                    Delete Plant-->
+<!--                                </button>-->
+                                <i class="fa-solid fa-circle-check align-middle"
+                                   style="color: <%= plant.identification.toLowerCase() === "complete" ? "#198754": "#9e9e9e" %>"
+                                   title="Plant identification <%= plant.identification.toLowerCase() %>">
+                                </i>
                             </div>
         <!--                            <h4 class="mb-2"><%= plant.name %></h4> &lt;!&ndash;plant name&ndash;&gt;-->
 
@@ -81,61 +87,62 @@
                                        title="Date spotted"></i> <%= plant.time %> - <%= plant.date %>
                                 </p>
                                 <p class="mb-2">
+                                    <%= plant.uname %>
                                     <i class="fa-solid fa-user align-middle"
-                                       title="User"></i> <%= plant.uname %>
+                                       title="User"></i>
                                 </p> <!--spotted by-->
                             </div>
 
                         </div>
 
-                        <div class="d-flex justify-content-between border-bottom border-dark mb-3"
+                        <div class="d-flex justify-content-center border-bottom border-dark mb-3"
                              id = "info-div-<%= plant._id%>">
-                            <div id="left-panel-<%= plant._id %>">
-                                <!-- plant height and spread -->
-                                <div id="height-spread-sun-<%= plant._id %>">
-                                    <div class="d-flex">
-                                        <i class="fa-solid fa-ruler-combined"
-                                           title="Plant spread and height in centimetres"></i>
-                                        <p class="ml-2 mr-3 align-middle"><%= plant.spread %>x<%= plant.height %>cm</p>
-                                    </div>
+<!--                            <div id="left-panel-<%= plant._id %>">-->
+<!--                                &lt;!&ndash; plant height and spread &ndash;&gt;-->
+<!--                                <div id="height-spread-sun-<%= plant._id %>">-->
+<!--                                    <div class="d-flex">-->
+<!--                                        <i class="fa-solid fa-ruler-combined"-->
+<!--                                           title="Plant spread and height in centimetres"></i>-->
+<!--                                        <p class="ml-2 mr-3 align-middle"><%= plant.spread %>x<%= plant.height %>cm</p>-->
+<!--                                    </div>-->
 
-                                    <p class="mr-1">
-                                        <i class="fa-solid fa-cloud-sun align-middle"
-                                           title="Sun coverage"></i> <%= plant.sun %>
-                                    </p>
-                                </div>
+<!--                                    <p class="mr-1">-->
+<!--                                        <i class="fa-solid fa-cloud-sun align-middle"-->
+<!--                                           title="Sun coverage"></i> <%= plant.sun %>-->
+<!--                                    </p>-->
+<!--                                </div>-->
 
-                                <div class="mb-1">
-                                    <div class="icon-div d-flex" id="icons-<%= plant._id %>">
-                                        <!-- leaf icon -->
-                                        <i class="fa-solid fa-leaf"
-                                           title="<%= plant.leaves ? "Has": "Does not have" %> leaves"
-                                           style="color: <%= plant.leaves ? "#000000": "#9e9e9e" %>"></i>
-                                        <!-- fruit icon -->
-                                        <i class="fa-solid fa-lemon"
-                                           title="<%= plant.fruit ? "Bears": "Does not bear" %> fruit"
-                                           style="color: <%= plant.fruit ? "#000000": "#9e9e9e" %>"></i>
-                                        <!-- seeds icon -->
-                                        <i class="fa-solid fa-seedling"
-                                           title="<%= plant.seeds ? "Has": "Does not have" %> seeds"
-                                           style="color: <%= plant.seeds ? "#000000": "#9e9e9e" %>"></i>
-                                        <!-- flower icon -->
-                                        <i class="vs vs-flower"
-                                           title="<%= plant.flowers ? "Has": "Does not have" %> flowers"
-                                           style="color: <%= plant.flowers ? "#000000": "#9e9e9e" %>"></i>
-                                    </div>
-                                    <% if (plant.flowers) { %>
-                                        <div class="d-flex">
-                                            <p class="mb-0">
-                                                <%= plant.flower_colour %>
-                                                <i class="fa-solid fa-palette align-middle"
-                                                   title="Flower colour"
-                                                   style="color: <%= plant.flowers ? "#000000": '#9e9e9e' %>"></i>
-                                            </p>
-                                        </div>
-                                    <% } %>
-                                </div>
-                            </div>
+<!--                                <div class="mb-1">-->
+<!--                                    <div class="icon-div d-flex" id="icons-<%= plant._id %>">-->
+<!--                                        &lt;!&ndash; leaf icon &ndash;&gt;-->
+<!--                                        <i class="fa-solid fa-leaf"-->
+<!--                                           title="<%= plant.leaves ? "Has": "Does not have" %> leaves"-->
+<!--                                           style="color: <%= plant.leaves ? "#000000": "#9e9e9e" %>"></i>-->
+<!--                                        &lt;!&ndash; fruit icon &ndash;&gt;-->
+<!--                                        <i class="fa-solid fa-lemon"-->
+<!--                                           title="<%= plant.fruit ? "Bears": "Does not bear" %> fruit"-->
+<!--                                           style="color: <%= plant.fruit ? "#000000": "#9e9e9e" %>"></i>-->
+<!--                                        &lt;!&ndash; seeds icon &ndash;&gt;-->
+<!--                                        <i class="fa-solid fa-seedling"-->
+<!--                                           title="<%= plant.seeds ? "Has": "Does not have" %> seeds"-->
+<!--                                           style="color: <%= plant.seeds ? "#000000": "#9e9e9e" %>"></i>-->
+<!--                                        &lt;!&ndash; flower icon &ndash;&gt;-->
+<!--                                        <i class="vs vs-flower"-->
+<!--                                           title="<%= plant.flowers ? "Has": "Does not have" %> flowers"-->
+<!--                                           style="color: <%= plant.flowers ? "#000000": "#9e9e9e" %>"></i>-->
+<!--                                    </div>-->
+<!--                                    <% if (plant.flowers) { %>-->
+<!--                                        <div class="d-flex">-->
+<!--                                            <p class="mb-0">-->
+<!--                                                <%= plant.flower_colour %>-->
+<!--                                                <i class="fa-solid fa-palette align-middle"-->
+<!--                                                   title="Flower colour"-->
+<!--                                                   style="color: <%= plant.flowers ? "#000000": '#9e9e9e' %>"></i>-->
+<!--                                            </p>-->
+<!--                                        </div>-->
+<!--                                    <% } %>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
                             <div id="right-panel" class="mb-2">
                                 <img src="<%= plant.photo %>" class="mw-100" id="photo-<%= plant._id %>">
@@ -144,19 +151,26 @@
 
                         <div class="d-flex justify-content-between">
                             <div>
-                                <i class="fa-solid fa-book-atlas align-middle"
-                                   title="View on DBPedia"></i>
-                                <a href="<%= plant.dbpedia %>" target="_blank">View on DBPedia</a>
+<!--                                <i class="fa-solid fa-book-atlas align-middle"-->
+<!--                                   title="View on DBPedia"></i>-->
+<!--                                <a href="<%= plant.dbpedia %>" target="_blank">View on DBPedia</a>-->
+                                <a href="/plants/<%= plant._id %>" class="mb-2 btn btn-outline-primary">View details</a>
                             </div>
 
-                            <p>
-                                <i class="fa-regular fa-id-card align-middle"
-                                   title="Identification status"></i> <%= plant.identification %>
-                            </p>
+                            <div>
+                                <button onclick="removePlant('<%= plant._id%>');" href="/" class="btn btn-outline-danger">
+                                    Delete
+                                </button>
+                            </div>
 
-                        <script>
-                          fixFormat("<%= plant._id %>");
-                        </script>
+<!--                            <p>-->
+<!--                                <i class="fa-regular fa-id-card align-middle"-->
+<!--                                   title="Identification status"></i> <%= plant.identification %>-->
+<!--                            </p>-->
+
+<!--                        <script>-->
+<!--                          fixFormat("<%= plant._id %>");-->
+<!--                        </script>-->
                         </div>
         <!--                        <div>-->
         <!--                            <div>-->

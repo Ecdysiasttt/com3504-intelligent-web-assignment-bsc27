@@ -64,7 +64,7 @@ const addNewPlantButtonEventListener = () => {
     navigator.serviceWorker.ready
       .then(function (serviceWorkerRegistration) {
           serviceWorkerRegistration.showNotification("Todo App",
-            {body: "Todo added! - " + name})
+            {body: "Plant added! - " + name})
             .then(r =>
               console.log(r)
             );
