@@ -32,7 +32,7 @@
 <main>
 
     <!--Render DBpedia results-->
-    <h1><%= plant.name%></h1>
+<!--    <h1><%= plant.name%></h1>-->
     <% try { %>
         <% var resultObj = JSON.parse(JSONresult); %>
         <% if (resultObj && Object.keys(resultObj).length > 0) { %>
@@ -48,12 +48,13 @@
         <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2">
             <!--                        meta-info: name, found by, found on... -->
             <div class="border-bottom border-dark mb-2">
-                <!--                            <i class="fa-solid fa-file-signature align-middle"></i>-->
-<!--                <div class="d-flex justify-content-between">-->
-<!--                    <h4 class="mb-2"><%= plant.name %></h4> &lt;!&ndash;plant name&ndash;&gt;-->
-                    <!--                                    <a href="/plants/test"> View details</a>-->
-<!--                </div>-->
-                <!--                            <h4 class="mb-2"><%= plant.name %></h4> &lt;!&ndash;plant name&ndash;&gt;-->
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-2"><%= plant.name %></h4> <!--plant name-->
+                    <i class="fa-solid align-middle <%= plant.identification.toLowerCase() === "complete" ? "fa-circle-check": "fa-circle-xmark" %>"
+                       style="color: <%= plant.identification.toLowerCase() === "complete" ? "#198754": "#9e9e9e" %>"
+                       title="Plant identification <%= plant.identification.toLowerCase() %>">
+                    </i>
+                </div>
 
                 <div class="d-flex justify-content-between">
                     <p class="mb-2">
@@ -61,8 +62,9 @@
                            title="Date spotted"></i> <%= plant.time %> - <%= plant.date %>
                     </p>
                     <p class="mb-2">
+                        <%= plant.uname %>
                         <i class="fa-solid fa-user align-middle"
-                           title="User"></i> <%= plant.uname %>
+                           title="User"></i>
                     </p> <!--spotted by-->
                 </div>
 
