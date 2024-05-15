@@ -72,6 +72,7 @@ router.get('/:plantId', async function (req, res, next) {
 
 
   try {
+    console.log(req.params.plantId);
     var plantId = req.params.plantId;
 
     // Wait for the promise to resolve
@@ -80,42 +81,99 @@ router.get('/:plantId', async function (req, res, next) {
     var allPlantsJSON = JSON.parse(allPlants);
 
     var thisPlant = allPlantsJSON.find(plant => plant._id === plantId);
+    console.log(thisPlant.name);
 
     // Retrieve data from DBpedia resource
-    // const resource = 'http://dbpedia.org/resource/' + thisPlant.name;
+    // const resource = 'http://dbpedia.org/resource/Tulip' + thisPlant.name;
 
-    const resource = 'http://dbpedia.org/resource/Paris';
+    const resource = 'http://dbpedia.org/resource/Tulip';
+// <!--    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>-->
+// <!--    PREFIX dbo: <http://dbpedia.org/ontology/>-->
 
     // SPARQL query
     const endpointUrl = 'https://dbpedia.org/sparql';
     const sparqlQuery = `
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX dbo: <http://dbpedia.org/ontology/>
-
-    SELECT ?label ?plant
+    SELECT DISTINCT ?plant ?comment ?species ?genus ?taxon
     WHERE {
-      <${resource}> rdfs:label ?label .
-      <${resource}> dbo:country ?country .
-    FILTER (langMatches(lang(?label), "en")) .
+      {
+        ?plant a dbo:Plant ;
+               rdfs:label "${thisPlant.name}"@en ;
+               rdfs:comment ?comment .
+        FILTER (LANG(?comment) = 'en')
+        OPTIONAL { ?plant dbp:species ?species }
+        OPTIONAL { ?plant dbp:genus ?genus }
+        OPTIONAL { ?plant dbp:taxon ?taxon }
+      }
+      UNION
+      {
+        ?redirect dbo:wikiPageRedirects ?plant ;
+                  rdfs:label "${thisPlant.name}"@en .
+        ?plant a dbo:Plant ;
+               rdfs:comment ?comment .
+        FILTER (LANG(?comment) = 'en')
+        OPTIONAL { ?plant dbp:species ?species }
+        OPTIONAL { ?plant dbp:genus ?genus }
+        OPTIONAL { ?plant dbp:taxon ?taxon }
+      }
     }`;
+    // TODO make search case-insensitive if possible?
+
+    // want to get:
+    // - common/scientific name
+    // - plant description
+    // - URI (Links to dbpedia page)
 
     const encodedQuery = encodeURIComponent(sparqlQuery);
 
+    console.log('sparqlQuery: ' + sparqlQuery);
+
     const url = `${endpointUrl}?query=${encodedQuery}&format=json`;
+
+    console.log("Url: " + url);
 
     // Retrieve data by fetch
     fetch(url)
         .then(response => response.json())
         .then(data => {
-          let bindings = data.results.bindings;
-          let result = JSON.stringify(bindings);
+          console.log(data.results.bindings.length === 0);
+          let plantInfo = data.results.bindings;
+          let uri = null;
+          let comment = null;
+          let species = null;
+          let genus = null;
+          let taxon = null;
+
+          let found = false;
+
+          if (plantInfo.length !== 0) {
+            found = true;
+
+            console.log(plantInfo);
+            console.log("Data found from DBPedia");
+            uri = plantInfo[0].plant.value;
+            comment = plantInfo[0].comment.value;
+            species = plantInfo[0].species ? plantInfo[0].species.value : null;
+            genus = plantInfo[0].genus ? plantInfo[0].genus.value : null;
+            taxon = plantInfo[0].taxon ? plantInfo[0].taxon.value : null;
+
+            console.log("URI = " + uri);
+            console.log("comment = " + comment);
+            console.log("species = " + species);
+            console.log("genus = " + genus);
+            console.log("taxon = " + taxon);
+          }
 
           // Render the result in plant.ejs
           res.render('plant', {
             // title: bindings[0].label.value,
             // plantDB: bindings[0].plant.value,
             plant: thisPlant,
-            JSONresult: result
+            uri: uri,
+            comment: comment,
+            species: species,
+            genus: genus,
+            taxonomy: taxon,
+            found: found
           });
         });
 
