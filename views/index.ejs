@@ -77,17 +77,26 @@
 
           // plantDiv.style.display = "block";
 
-          console.log("plant " + i);
+          // console.log("plant " + i);
 
-          if (!anyFilterSelected) {
-            plantDiv.style.display = "block";
-          } else {
-            plantDiv.style.display = "none";
-            for (let j = 0; j < checkboxes.length; j++) {
-              if (checkboxes[j].checked && checkboxes[j].checked === filters[j]) {
-                plantDiv.style.display = "block";
+          // Check if any filter is selected
+          if (anyFilterSelected) {
+            let allFiltersPassed = true;
+
+            // Check if all corresponding checkboxes are checked for each filter
+            for (let i = 0; i < checkboxes.length; i++) {
+              if (filters[i] && !checkboxes[i].checked) {
+                allFiltersPassed = false;
+                break;
               }
             }
+
+            // Set display style based on whether all filters are passed
+            plantDiv.style.display = allFiltersPassed ? "block" : "none";
+          } else {
+            // No filters selected, so display the plant
+            plantDiv.style.display = "block";
+          }
 
             // // Iterate over checkboxes within the current plant div
             // checkboxes.forEach(function(checkbox) {
@@ -98,7 +107,6 @@
             //   // Do something with the checkbox value
             //   console.log("Checkbox value:", checkboxValue);
             // });
-          }
         }
 
         console.log("Filters selected:");
