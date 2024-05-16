@@ -1,3 +1,12 @@
+/**
+ * This is the application's main entry point which defines the startup script.
+ * var app requires the entry point
+ * Events for error handling are set up.
+ * It sets up a node server that is set to a specific port.
+ * Socket.io package is loaded.
+ */
+
+
 #!/usr/bin/env node
 
 /**
