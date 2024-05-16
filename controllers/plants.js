@@ -69,7 +69,10 @@ exports.getAll = function () {
         dbpedia: 1,
         photo: 1,
         uname: 1,
-        chatId: 1
+        chatId: 1,
+        comments: 1,
+        longitude: 1,
+        latitude: 1
       }
     },
     {

@@ -12,6 +12,20 @@
         <script src="https://kit.fontawesome.com/7f6de5401f.js" crossorigin="anonymous"></script>
         <script src = "https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+        <script src="/javascripts/insert.js"></script>
+        <script src="../javascripts/index.js"></script>
+
+        <script>
+            window.onload = function() {
+                loadMap();
+                console.log('here');
+                setMapClickable();
+            };
+        </script>
+
+        <script src="../javascripts/idb-utility.js"></script>
+        <script src="../index.js"></script>
+
     </head>
 
     <body class="p-3">
@@ -166,9 +180,7 @@
             </form>
         </main>
 
-        <script src="/javascripts/insert.js"></script>
-        <script src="../javascripts/index.js"></script>
-        <script src="../javascripts/idb-utility.js"></script>
+
         <script>
             <!--    shows flower colour option if flower attribute selected -->
             const flowerCheck = document.getElementById("flowers");
@@ -191,13 +203,6 @@
             });
         </script>
 
-            <script>
-                window.onload = function() {
-                    loadMap();
-                    console.log('here');
-                    setMapClickable();
-                };
-            </script>
     </body>
 </html>
 

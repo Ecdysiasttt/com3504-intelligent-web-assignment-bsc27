@@ -1,134 +1,90 @@
-// Function to handle adding a new plant to the sync store
-const addNewPlantToSync = (syncPlantIDB, plantData) => {
-    if (plantData.uname !== "") {
-        const transaction = syncPlantIDB.transaction(["sync-plants"], "readwrite");
-        const plantStore = transaction.objectStore("sync-plants");
-        const addRequest = plantStore.add({ plantData });
-
-        addRequest.addEventListener("success", () => {
-            console.log("Added " + "#" + addRequest.result + ": " + plantData.uname);
-            navigator.serviceWorker.ready.then((sw) => {
-                sw.sync.register("sync-plant")
-                    .then(() => {
-                        console.log("Sync registered");
-                    }).catch((err) => {
-                    console.log("Sync registration failed: " + JSON.stringify(err));
-                });
-            });
-        });
-
-        addRequest.addEventListener("error", (event) => {
-            console.error("Error adding plant to sync store:", event.target.error);
-        });
-    }
-};
-
 // Function to add new plants to IndexedDB and return a promise
 const addNewPlantsToIDB = (plantIDB, plants) => {
     return new Promise((resolve, reject) => {
         const transaction = plantIDB.transaction(["plants"], "readwrite");
         const plantStore = transaction.objectStore("plants");
 
-        // console.log(plants);
-
         const addPromises = plants.map(plant => {
             return new Promise((resolveAdd, rejectAdd) => {
                 const addRequest = plantStore.add(plant);
                 addRequest.addEventListener("success", () => {
                     console.log("Added " + "#" + addRequest.result + ": " + plant.name);
-                    const getRequest = plantStore.get(addRequest.result);
-                    getRequest.addEventListener("success", () => {
-                        // console.log("Found " + JSON.stringify(getRequest.result));
-                        // Assume insertPlantInList is defined elsewhere
-                        // insertPlantInList(getRequest.result);
-                        resolveAdd(); // Resolve the add promise
-                    });
-                    getRequest.addEventListener("error", (event) => {
-                        rejectAdd(event.target.error); // Reject the add promise if there's an error
-                    });
+                    resolveAdd();
                 });
                 addRequest.addEventListener("error", (event) => {
-                    rejectAdd(event.target.error); // Reject the add promise if there's an error
+                    rejectAdd(event.target.error);
                 });
             });
         });
 
-        // Resolve the main promise when all add operations are completed
-        Promise.all(addPromises).then(() => {
-            resolve();
-        }).catch((error) => {
-            reject(error);
-        });
+        Promise.all(addPromises).then(resolve).catch(reject);
     });
 };
 
-// Function to remove all plants from IndexedDB
-const deleteAllExistingPlantsFromIDB = (plantIDB) => {
+// Function to retrieve data from IndexedDB
+function retrieveDataFromIndexedDB() {
     return new Promise((resolve, reject) => {
-        const transaction = plantIDB.transaction(["plants"], "readwrite");
-        const plantStore = transaction.objectStore("plants");
-        const clearRequest = plantStore.clear();
+        console.log('Attempting to retrieve data from IndexedDB');
+        const request = indexedDB.open('plants', 1);
 
-        clearRequest.addEventListener("success", () => {
-            resolve();
-            console.log('Cleared.')
-        });
+        request.onerror = function(event) {
+            console.error('IndexedDB error:', event.target.error);
+            reject(new Response(null, { status: 500, statusText: 'IndexedDB error' }));
+        };
 
-        clearRequest.addEventListener("error", (event) => {
-            reject(event.target.error);
-            console.log('Could not complete:', error);
-        });
+        request.onsuccess = function(event) {
+            const db = event.target.result;
+            const transaction = db.transaction(['plants'], 'readonly');
+            const objectStore = transaction.objectStore('plants');
+            const getRequest = objectStore.getAll();
+
+            getRequest.onsuccess = function(event) {
+                const data = event.target.result;
+                console.log('Data retrieved from IndexedDB:', data);
+                resolve(new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } }));
+            };
+
+            getRequest.onerror = function(event) {
+                console.error('Error fetching data from IndexedDB:', event.target.error);
+                reject(new Response(null, { status: 500, statusText: 'Error fetching data from IndexedDB' }));
+            };
+        };
     });
-};
+}
 
-// Function to get all plants from the IndexedDB
-const getAllPlants = (plantIDB) => {
+function getPlantsFromIDB() {
     return new Promise((resolve, reject) => {
-        const transaction = plantIDB.transaction(["plants"]);
-        const plantStore = transaction.objectStore("plants");
-        const getAllRequest = plantStore.getAll();
+        console.log('Attempting to retrieve data from IndexedDB');
+        const request = indexedDB.open('plants', 1);
 
-        getAllRequest.addEventListener("success", (event) => {
-            resolve(event.target.result);
-        });
+        request.onerror = function(event) {
+            console.error('IndexedDB error:', event.target.error);
+            reject(new Response(null, { status: 500, statusText: 'IndexedDB error' }));
+        };
 
-        getAllRequest.addEventListener("error", (event) => {
-            reject(event.target.error);
-        });
+        request.onsuccess = function(event) {
+            const db = event.target.result;
+            const transaction = db.transaction(['plants'], 'readonly');
+            const objectStore = transaction.objectStore('plants');
+            const getRequest = objectStore.getAll();
+
+            getRequest.onsuccess = function(event) {
+                const data = event.target.result;
+                console.log('Data retrieved from IndexedDB:', data);
+                resolve(data);
+            };
+
+            getRequest.onerror = function(event) {
+                console.error('Error fetching data from IndexedDB:', event.target.error);
+                reject(new Response(null, { status: 500, statusText: 'Error fetching data from IndexedDB' }));
+            };
+        };
     });
-};
+}
 
-// Function to get all sync plants from the IndexedDB
-const getAllSyncPlants = (syncPlantIDB) => {
-    return new Promise((resolve, reject) => {
-        const transaction = syncPlantIDB.transaction(["sync-plants"]);
-        const plantStore = transaction.objectStore("sync-plants");
-        const getAllRequest = plantStore.getAll();
 
-        getAllRequest.addEventListener("success", () => {
-            resolve(getAllRequest.result);
-        });
 
-        getAllRequest.addEventListener("error", (event) => {
-            reject(event.target.error);
-        });
-    });
-};
-
-// Function to delete a sync plant from IndexedDB
-const deleteSyncPlantFromIDB = (syncPlantIDB, id) => {
-    const transaction = syncPlantIDB.transaction(["sync-plants"], "readwrite");
-    const plantStore = transaction.objectStore("sync-plants");
-    const deleteRequest = plantStore.delete(id);
-
-    deleteRequest.addEventListener("success", () => {
-        console.log("Deleted " + id);
-    });
-
-    deleteRequest.addEventListener("error", (event) => {
-        console.error("Error deleting sync plant from IDB:", event.target.error);
-    });
-};
+// Functions to handle sync plants as already defined in your code
 
 // Function to open the plants IndexedDB
 function openPlantsIDB() {
@@ -171,3 +127,22 @@ function openSyncPlantsIDB() {
         };
     });
 }
+
+// Function to remove all plants from IndexedDB
+const deleteAllExistingPlantsFromIDB = (plantIDB) => {
+    return new Promise((resolve, reject) => {
+        const transaction = plantIDB.transaction(["plants"], "readwrite");
+        const plantStore = transaction.objectStore("plants");
+        const clearRequest = plantStore.clear();
+
+        clearRequest.addEventListener("success", () => {
+            resolve();
+            console.log('Cleared.')
+        });
+
+        clearRequest.addEventListener("error", (event) => {
+            reject(event.target.error);
+            console.log('Could not complete:', error);
+        });
+    });
+};
