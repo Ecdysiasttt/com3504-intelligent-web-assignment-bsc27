@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var plants = require('../controllers/plants');
+const path = require('path');
+const fs = require('fs');
 
 
 var todoController = require('../controllers/todo');
@@ -18,6 +20,32 @@ jsonEntry = {
 }
 
 
+// router.get('/plants', async (req, res) => {
+//     try {
+//         const allPlants = await plants.getAll();
+//         res.status(200).json(allPlants);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: 'Failed to fetch plants' });
+//     }
+// });
+//
+// router.get('/', async (req, res) => {
+//     try {
+//         const allPlants = await plants.getAll();
+//         res.render('index', {
+//                 title: jsonEntry.title,
+//                 site_name: 'Plantpedia',
+//                 data: allPlants,
+//                 path: jsonEntry.path
+//             });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send('Failed to fetch plants');
+//     }
+// });
+
+
 router.get('/plants', function (req, res, next) {
   plants.getAll().then(plants => {
     console.log(plants);
@@ -28,23 +56,6 @@ router.get('/plants', function (req, res, next) {
   });
 });
 
-function compareDateTime(a, b) {
-  console.log("huio");
-  // Parse date and time strings to create Date objects
-  let dateA = new Date(a.date + ' ' + a.time);
-  let dateB = new Date(b.date + ' ' + b.time);
-
-  // Compare the Date objects
-  if (dateA < dateB) {
-    return -1; // dateA comes before dateB
-  } else if (dateA > dateB) {
-    return 1; // dateA comes after dateB
-  } else {
-    return 0; // dates are equal
-  }
-}
-
-/* GET home page. */
 router.get('/', function(req, res, next) {
     // Fetch plants from the /plants endpoint
     fetch('http://localhost:3000/plants')
@@ -70,20 +81,40 @@ router.get('/', function(req, res, next) {
         });
 });
 
+function compareDateTime(a, b) {
+  console.log("huio");
+  // Parse date and time strings to create Date objects
+  let dateA = new Date(a.date + ' ' + a.time);
+  let dateB = new Date(b.date + ' ' + b.time);
+
+  // Compare the Date objects
+  if (dateA < dateB) {
+    return -1; // dateA comes before dateB
+  } else if (dateA > dateB) {
+    return 1; // dateA comes after dateB
+  } else {
+    return 0; // dates are equal
+  }
+}
 
 
-// route to get all todos
+/* GET home page. */
 
-//TODO =============== COMMENTING THESE OUT UNTIL TODOCONTROLLER IS ADDED =============== //
-// router.get('/todos', function (req, res, next) {
-//     todoController.getAll().then(todos => {
-//         console.log(todos);
-//         return res.status(200).send(todos);
-//     }).catch(err => {
-//         console.log(err);
-//         res.status(500).send(err);
-//     });
-// })
+
+//Route for images to cache
+router.get('/images/list', (req, res) => {
+    const imagesDir = path.join(__dirname, '../','public', 'images', 'uploads');
+    console.log(imagesDir);
+    fs.readdir(imagesDir, (err, files) => {
+        if (err) {
+            return res.status(515).json({ error: 'Failed to list images' });
+        }
+
+        const imageUrls = files.map(file => `../public/images/uploads/${file}`);
+        res.json(imageUrls);
+    });
+});
+
 
 // route to add a new todo
 router.post('/add-todo', function(req, res, next) {
@@ -96,52 +127,6 @@ router.post('/add-todo', function(req, res, next) {
         res.status(500).send(err);
     });
 });
-
-
-
-
-  /* Knoweldge Graph of plant from DBpedia */
-
-//I think this is in the wrong place, and 'plant' is not a thing. This doesn't load. Moving the code to the plant route instead...
-
-  // Create a new GET route for plant
-// router.get('/' + plant.name, function (req, res, next) {
-//
-//   // Retrieve data from DBpedia resource
-//   const resource = 'http://dbpedia.org/resource/' + plant.name;
-//
-//   // SPARQL query
-//   const endpointUrl = 'https://dbpedia.org/sparql';
-//   const sparqlQuery = `
-//     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-//     PREFIX dbo: <http://dbpedia.org/ontology/>
-//
-//     SELECT ?label ?plant
-//     WHERE {
-//       <${resource}> rdfs:label ?label .
-//       <${resource}> dbo:plant ?plant .
-//     FILTER (langMatches(lang(?label), "en")) .
-//     }`;
-//
-//   const encodedQuery = encodeURIComponent(sparqlQuery);
-//
-//   const url = `${endpointUrl}?query=${encodedQuery}&format=json`;
-//
-//   // Retrieve data by fetch
-//   fetch(url)
-//       .then(response => response.json())
-//       .then(data => {
-//         let bindings = data.results.bindings;
-//         let result = JSON.stringify(bindings);
-//
-//         // Render the result in plant.ejs
-//         res.render('plant', {
-//           title: bindings[0].label.value,
-//           plant: bindings[0].plant.value,
-//           JSONresult: result
-//         });
-//       });
-// });
 
 
 module.exports = router;

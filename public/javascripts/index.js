@@ -38,7 +38,7 @@ const insertPlantInList = (plant) => {
 
         // Construct the HTML content for the plant
         div.innerHTML = `
-            <div class="border-bottom border-dark mb-2">
+<div class="border-bottom border-dark mb-2">
                 <div class="d-flex justify-content-between">
                     <h4 class="mb-2">${plant.name}</h4>
                     <a href="/plants/${plant._id}" class="mb-2">View details</a>
@@ -117,40 +117,81 @@ function init() {
 
     //check if online. if online, save current plants to iDB
 
-    if (navigator.onLine) {
-        //fetch plants from mongoDB
-        //store in iDB
-        console.log('Online mode')
-        fetch('http://localhost:3000/plants')
-            .then(function (res) {
-                return res.json();
-            }).then(function (newPlants) {
-            openPlantsIDB().then((db) => {
-                // console.log(newPlants);
-                deleteAllExistingPlantsFromIDB(db).then(() => {
-                    addNewPlantsToIDB(db, newPlants).then(() => {
-                        console.log("All new plants added to IDB")
-                    })
-                });
-            });
-        });
+    // if (navigator.onLine) {
+    //     //fetch plants from mongoDB
+    //     //store in iDB
+    //     console.log('Online mode')
+    //     fetch('http://localhost:3000/plants')
+    //         .then(function (res) {
+    //             return res.json();
+    //         }).then(function (newPlants) {
+    //         openPlantsIDB().then((db) => {
+    //             // console.log(newPlants);
+    //             deleteAllExistingPlantsFromIDB(db).then(() => {
+    //                 addNewPlantsToIDB(db, newPlants).then(() => {
+    //                     console.log("All new plants added to IDB")
+    //                 })
+    //             });
+    //         });
+    //     });
+    //     // fetch('http://localhost:3000/').then(function(res) {
+    //     //    res.render()
+    //     // });
+    //
+    // } else {
+    //     //fetch plants from iDB
+    //     //use these instead
+    //     console.log("Offline mode")
+    //     // fetch('http://localhost:3000/fetch')
+    //     // openPlantsIDB().then((db) => {
+    //     //     getAllPlants(db).then((plants) => {
+    //     //         for (const plant of plants) {
+    //     //             insertPlantInList(plant)
+    //     //         }
+    //     //     });
+    //     // });
 
-    } else {
-        //fetch plants from iDB
-        //use these instead
-        console.log("Offline mode")
-        // openPlantsIDB().then((db) => {
-        //     getAllPlants(db).then((plants) => {
-        //         for (const plant of plants) {
-        //             insertPlantInList(plant)
-        //         }
-        //     });
-        // });
-
-    }
+    // }
 
 }
 
+async function fetchPlants() {
+    if (navigator.onLine) {
+        // Fetch plants from MongoDB and store in IndexedDB
+        console.log('Online mode');
+        const response = await fetch('http://localhost:3000/plants');
+        const newPlants = await response.json();
+        const db = await openPlantsIDB();
+        await deleteAllExistingPlantsFromIDB(db);
+        await addNewPlantsToIDB(db, newPlants);
+        return newPlants;
+    } else {
+        // Fetch plants from IndexedDB
+        console.log('Offline mode');
+        const db = await openPlantsIDB();
+        let newPlants = await getPlantsFromIDB();
+        console.log('NEW PLANTS: ', newPlants);
+        return newPlants;
+    }
+}
+
+async function fetchAndRenderIndexPage() {
+    const plants = await fetchPlants();
+    console.log('Online:', navigator.onLine);
+    console.log(plants);
+    renderIndexPage(plants);
+}
+
+function renderIndexPage(plants) {
+    const container = document.getElementById('plant-container');
+    container.innerHTML = ''; // Clear existing content
+    plants.forEach(insertPlantInList);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Call fetchAndRenderIndexPage when the DOM content is loaded
+    fetchAndRenderIndexPage();
+});
 function loadMap(){
     //Initialise leaflet map
     map = L.map('map').setView([0, 0], 13); //Default long/lat of 0,0

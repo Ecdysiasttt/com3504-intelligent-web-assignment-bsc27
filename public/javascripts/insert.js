@@ -71,7 +71,7 @@ const addNewPlantButtonEventListener = () => {
       });
 }
 
-window.onload = function () {
+navigator.onload = function () {
     // Add event listeners to buttons
     const add_btn = document.getElementById("add_btn");
     add_btn.addEventListener("click", addNewPlantButtonEventListener);
