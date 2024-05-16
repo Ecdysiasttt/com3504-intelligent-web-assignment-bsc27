@@ -43,7 +43,6 @@ exports.create = function (userData, filePath, date, time, chatId, comments, lon
 };
 
 exports.getAll = function () {
-  // Use the aggregate method to perform the aggregation pipeline
   return plantModel.aggregate([
     {
       $project: {
@@ -52,8 +51,8 @@ exports.getAll = function () {
         date: 1, // Include the original date field
         dateSort: {
           $dateFromString: {
-            dateString: { $concat: [ '$date', ' ', '$time' ] }, // Concatenate date and time strings
-            format: "%d/%m/%Y %H:%M" // Specify the format of the concatenated string
+            dateString: { $concat: [ '$date', ' ', '$time' ] },
+            format: "%d/%m/%Y %H:%M"
           }
         },
         time: 1,
@@ -74,7 +73,7 @@ exports.getAll = function () {
       }
     },
     {
-      $sort: { dateSort : 1 } // Sort the documents based on the date field in ascending order
+      $sort: { identification : -1, dateSort : -1 } // Sort plants
     }
   ]).then(plants => {
     // Return the list of plants as a JSON string
