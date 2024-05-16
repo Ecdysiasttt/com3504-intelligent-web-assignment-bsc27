@@ -63,6 +63,7 @@ router.post('/add', upload.single('photo'), async function(req, res, next) {
 
 
   let result = plants.create(userData, filePath, date, time, chatId, comments, longitude, latitude);
+
   console.log(result);
 
   res.redirect('/');

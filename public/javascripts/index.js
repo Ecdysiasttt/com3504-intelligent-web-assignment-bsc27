@@ -108,21 +108,17 @@ function init() {
     //Create user info - unique name and function to add message to history when sent
     name = "User-" + Math.floor(Math.random() * 90000 + 100000);
     // called when a message is received
-    socket.on('chat', function (chatId, userId, chatText) {
-        writeOnHistory('<b>' + userId + ':</b> ' + chatText, chatId);
-    });
+    if (typeof io === "function") {
+        socket.on('chat', function (chatId, userId, chatText) {
+            writeOnHistory('<b>' + userId + ':</b> ' + chatText, chatId);
+        });
+    }
 
     //check if online. if online, save current plants to iDB
 
-    if (navigator.onLine){
+    if (navigator.onLine) {
         //fetch plants from mongoDB
         //store in iDB
-    } else{
-        //fetch plants from iDB
-        //use these instead
-    }
-
-    if (navigator.onLine) {
         console.log('Online mode')
         fetch('http://localhost:3000/plants')
             .then(function (res) {
@@ -139,6 +135,8 @@ function init() {
         });
 
     } else {
+        //fetch plants from iDB
+        //use these instead
         console.log("Offline mode")
         // openPlantsIDB().then((db) => {
         //     getAllPlants(db).then((plants) => {

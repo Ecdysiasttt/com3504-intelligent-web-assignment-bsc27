@@ -30,19 +30,31 @@ router.get('/plants', function (req, res, next) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  let result = plants.getAll();
-
-  result.then(plants => {
-    let data = JSON.parse(plants);
-    console.log(data.length + " plants in database");
-    res.render('index', {
-      title: jsonEntry.title,
-      site_name: 'Plantpedia',
-      data: data,
-      path: jsonEntry.path
-    });
-  });
+    // Fetch plants from the /plants endpoint
+    fetch('http://localhost:3000/plants')
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Failed to fetch plants');
+            }
+            console.log('Got plants')
+            return response.json();
+        })
+        .then(function (plants) {
+            // Render the homepage with the fetched plant data
+            res.render('index', {
+                title: jsonEntry.title,
+                site_name: 'Plantpedia',
+                data: plants,
+                path: jsonEntry.path
+            });
+        })
+        .catch(function (error) {
+            console.error('Error fetching plants:', error);
+            res.status(500).send('Failed to fetch plants');
+        });
 });
+
+
 
 // route to get all todos
 
