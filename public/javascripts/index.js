@@ -34,11 +34,10 @@ const insertPlantInList = (plant) => {
 
         const div = document.createElement("div");
         div.id = `div-${plant._id}`;
-        div.classList.add("mb-2", "border", "border-dark", "rounded", "p-2");
+        div.classList.add("mb-2", "border", "border-dark", "rounded", "p-2", "plant");
 
         // Construct the HTML content for the plant
         div.innerHTML = `
-        <div id="div-${plant._id}" class="mb-2 border border-dark rounded p-2 plant">
             <!-- for filtering -->
             <input type="checkbox" id="filter-flowers" name="flowers" ${plant.flowers ? 'checked' : ''} hidden>
             <input type="checkbox" id="filter-leaves" name="leaves" ${plant.leaves ? 'checked' : ''} hidden>
@@ -78,7 +77,7 @@ const insertPlantInList = (plant) => {
                     </button>
                 </div>
             </div>
-        </div>`;
+        `;
 
         // Append the constructed div to the container
         container.appendChild(div);

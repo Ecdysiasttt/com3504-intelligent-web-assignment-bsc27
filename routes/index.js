@@ -81,23 +81,6 @@ router.get('/', function(req, res, next) {
         });
 });
 
-function compareDateTime(a, b) {
-  console.log("huio");
-  // Parse date and time strings to create Date objects
-  let dateA = new Date(a.date + ' ' + a.time);
-  let dateB = new Date(b.date + ' ' + b.time);
-
-  // Compare the Date objects
-  if (dateA < dateB) {
-    return -1; // dateA comes before dateB
-  } else if (dateA > dateB) {
-    return 1; // dateA comes after dateB
-  } else {
-    return 0; // dates are equal
-  }
-}
-
-
 /* GET home page. */
 
 
@@ -115,10 +98,13 @@ router.get('/images/list', (req, res) => {
     });
 });
 
-router.post('/login', function (req, res, next) {
-  let username = req.body.uname;
-  res.render('index', { title: 'COM3504/3604', login_is_correct: false });
-})
+// router.post('/login', function (req, res, next) {
+//   // console.log("hjiklfhdsakjfhdslakjsdkfladfjkh");
+//   let username = req.body.uname;
+//   window.localStorage.setItem("username", username);
+//   // res.render('index', { title: 'COM3504/3604', login_is_correct: false });
+//   res.redirect('/');
+// })
 
 
 // route to add a new todo
