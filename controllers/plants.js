@@ -42,10 +42,40 @@ exports.create = function (userData, filePath, date, time, chatId, comments, lon
 
 };
 
-// Function to get all plants
 exports.getAll = function () {
-  // Retrieve all plants from the database
-  return plantModel.find({}).then(plants => {
+  return plantModel.aggregate([
+    {
+      $project: {
+        // Project all existing fields along with the original date and the formatted date for sorting
+        _id: 1,
+        date: 1, // Include the original date field
+        dateSort: {
+          $dateFromString: {
+            dateString: { $concat: [ '$date', ' ', '$time' ] },
+            format: "%d/%m/%Y %H:%M"
+          }
+        },
+        time: 1,
+        height: 1,
+        spread: 1,
+        flowers: 1,
+        flower_colour: 1,
+        leaves: 1,
+        fruit: 1,
+        seeds: 1,
+        sun: 1,
+        name: 1,
+        identification: 1,
+        dbpedia: 1,
+        photo: 1,
+        uname: 1,
+        chatId: 1
+      }
+    },
+    {
+      $sort: { identification : -1, dateSort : -1 } // Sort plants
+    }
+  ]).then(plants => {
     // Return the list of plants as a JSON string
     return JSON.stringify(plants);
   }).catch(err => {

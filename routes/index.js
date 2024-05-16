@@ -28,6 +28,22 @@ router.get('/plants', function (req, res, next) {
   });
 });
 
+function compareDateTime(a, b) {
+  console.log("huio");
+  // Parse date and time strings to create Date objects
+  let dateA = new Date(a.date + ' ' + a.time);
+  let dateB = new Date(b.date + ' ' + b.time);
+
+  // Compare the Date objects
+  if (dateA < dateB) {
+    return -1; // dateA comes before dateB
+  } else if (dateA > dateB) {
+    return 1; // dateA comes after dateB
+  } else {
+    return 0; // dates are equal
+  }
+}
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     // Fetch plants from the /plants endpoint

@@ -100,7 +100,7 @@ router.get('/:plantId', async function (req, res, next) {
         ?plant a dbo:Plant ;
                rdfs:label "${thisPlant.name}"@en ;
                rdfs:comment ?comment .
-        FILTER (LANG(?comment) = 'en')
+        FILTER (LANG(?comment) = 'en') 
         OPTIONAL { ?plant dbp:species ?species }
         OPTIONAL { ?plant dbp:genus ?genus }
         OPTIONAL { ?plant dbp:taxon ?taxon }

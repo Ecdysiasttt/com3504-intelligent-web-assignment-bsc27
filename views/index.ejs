@@ -18,54 +18,123 @@
 
     <%- include('./partials/header.ejs') %>
 
-    <main>
-        <script>
+    <script>
+      function toggleShowFilters() {
+        let filterDiv = document.getElementById('filters');
+        let toggleFilterButton = document.getElementById('filter-btn');
+        let filterDivDisplay = filterDiv.style.display;
+        if (filterDivDisplay === "none") {
+          // Show filters with swipe-down effect
+          console.log('Showing');
+          filterDiv.style.display = "block";
+          let height = filterDiv.scrollHeight;
+          filterDiv.style.height = '0'; // Set initial height to 0
+          setTimeout(() => {
+            filterDiv.style.height = height + 'px'; // Expand height
+          }, 10); // Delay to ensure the element is visible before transitioning
+          toggleFilterButton.innerText = "Hide filters";
+          toggleFilterButton.classList.remove("btn-primary");
+          toggleFilterButton.classList.add("btn-secondary");
+        } else {
+          // Hide filters with swipe-up effect
+          console.log('Hiding');
+          filterDiv.style.height = '0'; // Collapse height
+          setTimeout(() => {
+            filterDiv.style.display = "none";
+          }, 300); // Duration of swipe-up transition
+          toggleFilterButton.innerText = "Show filters";
+          toggleFilterButton.classList.remove("btn-secondary");
+          toggleFilterButton.classList.add("btn-primary");
+        }
+      }
 
-          function fixFormat(plantID) {
-            var photo = document.getElementById('photo-' + plantID);
+      function submitFilters() {
+        console.log("Applying filters");
 
-            var width = photo.naturalWidth;
-            var height = photo.naturalHeight;
+        let filters = [
+          document.getElementById('filter-flowers').checked,    // isFlowersSelected
+          document.getElementById('filter-leaves').checked,     // isLeavesSelected
+          document.getElementById('filter-fruit').checked,      // isFruitSelected
+          document.getElementById('filter-seeds').checked       // isSeedsSelected
+        ];
 
-            // should the formatting be vertical?, i.e. photo stacked on top of info?
-            var isVertical = (!((Math.abs(width - height) > 0.05 * height) && height > width));
+        let anyFilterSelected = filters.some(value => value === true); // false if no filter is selected
 
-            console.log("Is layout vertical? " + isVertical);
+        // get all plant divs
+        let allPlants = document.getElementsByClassName("plant");
 
-            var infoPanel = document.getElementById('left-panel-'+ plantID);
-            var icons = document.getElementById('icons-' + plantID);
+        // Iterate over each plant div
+        for (let i = 0; i < allPlants.length; i++) {
+          let plantDiv = allPlants[i];
+          let checkboxes = plantDiv.querySelectorAll('input[type="checkbox"]');
 
-            // adjust formatting based on photo orientation
-            if (isVertical) {
-              var infoContainer = document.getElementById('info-div-' + plantID);
+          // Check if any filter is selected
+          if (anyFilterSelected) {
+            let allFiltersPassed = true;
 
-              // set photo width to 35% (was 100% before)
-              photo.style.width = "100%";
-
-              infoContainer.style.flexDirection = "column-reverse";
-
-              infoPanel.style.display = "flex";
-              infoPanel.style.justifyContent = "space-between";
-
-              icons.style.justifyContent = "flex-end";
-              for (var child of icons.children) {
-                child.style.marginLeft = "0.5rem";
-              }
-            } else {
-              infoPanel.style.minWidth = "35%";
-
-              icons.style.flexDirection = "column";
-              for (var child of icons.children) {
-                child.style.marginTop = "0.5rem";
+            // Check if all corresponding checkboxes are checked for each filter
+            for (let i = 0; i < checkboxes.length; i++) {
+              if (filters[i] && !checkboxes[i].checked) {
+                allFiltersPassed = false;
+                break;
               }
             }
+            // Set display style based on whether all filters are passed
+            plantDiv.style.display = allFiltersPassed ? "block" : "none";
+          } else {
+            // No filters selected, so display the plant
+            plantDiv.style.display = "block";
           }
-        </script>
+        }
+      }
+
+    </script>
+
+    <main>
+        <% if (data.length > 0) { %>
+            <div>
+                <button onclick="toggleShowFilters()" type="button"  id="filter-btn" class="btn btn-primary mb-2 btn-sm">Show filters</button>
+                <div class="" id="filters" style="display: none;">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="form-check">
+                                <input type="checkbox" id="filter-flowers" name="flowers">
+                                <label for="flowers">Flowers</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input type="checkbox" id="filter-leaves" name="leaves">
+                                <label for="leaves">Leaves</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input type="checkbox" id="filter-fruit" name="fruit">
+                                <label for="fruit">Fruit</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input type="checkbox" id="filter-seeds" name="seeds">
+                                <label for="seeds">Seeds</label>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column-reverse">
+                            <button onclick="submitFilters()" type="button" id="apply-btn" class="btn btn-success btn-sm mb-2">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
 
         <div id="plant-container">
             <% if (data.length > 0) { %>
                 <% data.forEach(plant => { %>
-                    <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2">
+                    <% console.log("Rendering: " + plant._id); %>
+                    <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2 plant">
+<!--                        for filtering -->
+                        <input type="checkbox" id="filter-flowers" name="flowers" <% if (plant.flowers) { %> checked <% } %> hidden>
+                        <input type="checkbox" id="filter-leaves" name="leaves" <% if (plant.leaves) { %> checked <% } %> hidden>
+                        <input type="checkbox" id="filter-fruit" name="fruit" <% if (plant.fruit) { %> checked <% } %> hidden>
+                        <input type="checkbox" id="filter-seeds" name="seeds" <% if (plant.seeds) { %> checked <% } %> hidden>
         <!--                        meta-info: name, found by, found on... -->
                         <div class="border-bottom border-dark mb-2">
                             <div class="d-flex justify-content-between align-items-baseline">
@@ -92,52 +161,6 @@
 
                         <div class="d-flex justify-content-center border-bottom border-dark mb-3"
                              id = "info-div-<%= plant._id%>">
-<!--                            <div id="left-panel-<%= plant._id %>">-->
-<!--                                &lt;!&ndash; plant height and spread &ndash;&gt;-->
-<!--                                <div id="height-spread-sun-<%= plant._id %>">-->
-<!--                                    <div class="d-flex">-->
-<!--                                        <i class="fa-solid fa-ruler-combined"-->
-<!--                                           title="Plant spread and height in centimetres"></i>-->
-<!--                                        <p class="ml-2 mr-3 align-middle"><%= plant.spread %>x<%= plant.height %>cm</p>-->
-<!--                                    </div>-->
-
-<!--                                    <p class="mr-1">-->
-<!--                                        <i class="fa-solid fa-cloud-sun align-middle"-->
-<!--                                           title="Sun coverage"></i> <%= plant.sun %>-->
-<!--                                    </p>-->
-<!--                                </div>-->
-
-<!--                                <div class="mb-1">-->
-<!--                                    <div class="icon-div d-flex" id="icons-<%= plant._id %>">-->
-<!--                                        &lt;!&ndash; leaf icon &ndash;&gt;-->
-<!--                                        <i class="fa-solid fa-leaf"-->
-<!--                                           title="<%= plant.leaves ? "Has": "Does not have" %> leaves"-->
-<!--                                           style="color: <%= plant.leaves ? "#000000": "#9e9e9e" %>"></i>-->
-<!--                                        &lt;!&ndash; fruit icon &ndash;&gt;-->
-<!--                                        <i class="fa-solid fa-lemon"-->
-<!--                                           title="<%= plant.fruit ? "Bears": "Does not bear" %> fruit"-->
-<!--                                           style="color: <%= plant.fruit ? "#000000": "#9e9e9e" %>"></i>-->
-<!--                                        &lt;!&ndash; seeds icon &ndash;&gt;-->
-<!--                                        <i class="fa-solid fa-seedling"-->
-<!--                                           title="<%= plant.seeds ? "Has": "Does not have" %> seeds"-->
-<!--                                           style="color: <%= plant.seeds ? "#000000": "#9e9e9e" %>"></i>-->
-<!--                                        &lt;!&ndash; flower icon &ndash;&gt;-->
-<!--                                        <i class="vs vs-flower"-->
-<!--                                           title="<%= plant.flowers ? "Has": "Does not have" %> flowers"-->
-<!--                                           style="color: <%= plant.flowers ? "#000000": "#9e9e9e" %>"></i>-->
-<!--                                    </div>-->
-<!--                                    <% if (plant.flowers) { %>-->
-<!--                                        <div class="d-flex">-->
-<!--                                            <p class="mb-0">-->
-<!--                                                <%= plant.flower_colour %>-->
-<!--                                                <i class="fa-solid fa-palette align-middle"-->
-<!--                                                   title="Flower colour"-->
-<!--                                                   style="color: <%= plant.flowers ? "#000000": '#9e9e9e' %>"></i>-->
-<!--                                            </p>-->
-<!--                                        </div>-->
-<!--                                    <% } %>-->
-<!--                                </div>-->
-<!--                            </div>-->
 
                             <div id="right-panel" class="mb-2">
                                 <img src="<%= plant.photo %>" class="mw-100" id="photo-<%= plant._id %>">
@@ -157,38 +180,7 @@
                                     Delete
                                 </button>
                             </div>
-
-<!--                            <p>-->
-<!--                                <i class="fa-regular fa-id-card align-middle"-->
-<!--                                   title="Identification status"></i> <%= plant.identification %>-->
-<!--                            </p>-->
-
-<!--                        <script>-->
-<!--                          fixFormat("<%= plant._id %>");-->
-<!--                        </script>-->
                         </div>
-        <!--                        <div>-->
-        <!--                            <div>-->
-        <!--                                &lt;!&ndash;TODO - Fix comments history not being shown when user opens comments initially or reloads page &ndash;&gt;-->
-        <!--                                &lt;!&ndash;TODO - Fix comments send to wrong plant if receiver opens new chatroom &ndash;&gt;-->
-        <!--                                <i class="fa-regular fa-comments align-middle"-->
-        <!--                                   title="Comments:"></i> <button onclick="-->
-        <!--                                        toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');-->
-        <!--                                        ">View Comments</button>-->
-        <!--                                <div id="chat_interface-<%= plant.chatId%>" style="display: none">-->
-        <!--                                    <div id="history-<%= plant.chatId%>" class="boxed"></div>-->
-        <!--                                    <div id="input" class="bottom boxed">-->
-        <!--                                        <form onsubmit="return false;" style="width: 100%">-->
-        <!--                                            <p>-->
-        <!--                                                <label for="name"> Comment: </label>-->
-        <!--                                                <input type="text" id="chat_input" name="chat_input" style="width: 80%">-->
-        <!--                                                <button id="chat_send" onclick="connectToRoom('<%= plant.chatId%>', '<%= plant.uname%>'); sendChatText(chat_input, '<%= plant.chatId%>'); chat_input.value = ''">Send</button>-->
-        <!--                                            </p>-->
-        <!--                                        </form>-->
-        <!--                                    </div>-->
-        <!--                                </div>-->
-        <!--                            </div>-->
-        <!--                        </div>-->
                     </div>
                 <% });%>
             <% } else { %>
