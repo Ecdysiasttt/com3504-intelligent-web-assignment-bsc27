@@ -23,7 +23,7 @@ i {
   margin-bottom: 15px;
 }
 
-#filters {
+#filters, #login {
   overflow: hidden;
   transition: height 0.3s ease; /* Add a transition effect */
 }

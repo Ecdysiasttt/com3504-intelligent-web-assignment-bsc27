@@ -21,32 +21,84 @@
 
     <script>
       function toggleShowFilters() {
+        let loginDiv = document.getElementById('login');
+        let showLoginButton = document.getElementById('login-btn');
         let filterDiv = document.getElementById('filters');
         let toggleFilterButton = document.getElementById('filter-btn');
-        let filterDivDisplay = filterDiv.style.display;
-        if (filterDivDisplay === "none") {
-          // Show filters with swipe-down effect
-          console.log('Showing');
-          filterDiv.style.display = "block";
-          let height = filterDiv.scrollHeight;
-          filterDiv.style.height = '0'; // Set initial height to 0
-          setTimeout(() => {
-            filterDiv.style.height = height + 'px'; // Expand height
-          }, 10); // Delay to ensure the element is visible before transitioning
-          toggleFilterButton.innerText = "Hide filters";
-          toggleFilterButton.classList.remove("btn-primary");
-          toggleFilterButton.classList.add("btn-secondary");
+        if (filterDiv.style.display === "none") {
+          // hide login if visible, then show filters
+          if (loginDiv.style.display !== "none")
+            hideLogin(loginDiv, showLoginButton)
+          showFilters(filterDiv,toggleFilterButton)
         } else {
           // Hide filters with swipe-up effect
-          console.log('Hiding');
-          filterDiv.style.height = '0'; // Collapse height
-          setTimeout(() => {
-            filterDiv.style.display = "none";
-          }, 300); // Duration of swipe-up transition
-          toggleFilterButton.innerText = "Show filters";
-          toggleFilterButton.classList.remove("btn-secondary");
-          toggleFilterButton.classList.add("btn-primary");
+          hideFilters(filterDiv, toggleFilterButton)
         }
+      }
+
+      function login() {
+        let loginDiv = document.getElementById('login');
+        let showLoginButton = document.getElementById('login-btn');
+        let filterDiv = document.getElementById('filters');
+        let toggleFilterButton = document.getElementById('filter-btn');
+        if (loginDiv.style.display === "none") {
+          // hide filters if visible, then show login
+          if (filterDiv.style.display !== "none")
+            hideFilters(filterDiv, toggleFilterButton);
+          showLogin(loginDiv, showLoginButton);
+        } else {
+          hideLogin(loginDiv, showLoginButton);
+        }
+      }
+
+      function showLogin(loginDiv, showLoginButton) {
+        // console.log('Showing login');
+        loginDiv.style.display = "block";
+        let height = loginDiv.scrollHeight;
+        loginDiv.style.height = '0'; // Set initial height to 0
+        setTimeout(() => {
+          loginDiv.style.height = height + 'px'; // Expand height
+        }, 10); // Delay to ensure the element is visible before transitioning
+        showLoginButton.innerText = "Hide";
+        showLoginButton.classList.remove("btn-primary");
+        showLoginButton.classList.add("btn-secondary");
+      }
+
+      function hideLogin(loginDiv, showLoginButton) {
+        // console.log('Hiding login');
+        loginDiv.style.height = '0'; // Collapse height
+        setTimeout(() => {
+          loginDiv.style.display = "none";
+        }, 300); // Duration of swipe-up transition
+        showLoginButton.innerText = "Login";
+        showLoginButton.classList.remove("btn-secondary");
+        showLoginButton.classList.add("btn-primary");
+      }
+
+      function hideFilters(filterDiv, toggleFilterButton) {
+        // Hide filters with swipe-up effect
+        // console.log('Hiding filters');
+        filterDiv.style.height = '0'; // Collapse height
+        setTimeout(() => {
+          filterDiv.style.display = "none";
+        }, 300); // Duration of swipe-up transition
+        toggleFilterButton.innerText = "Show filters";
+        toggleFilterButton.classList.remove("btn-secondary");
+        toggleFilterButton.classList.add("btn-primary");
+      }
+
+      function showFilters(filterDiv,toggleFilterButton) {
+        // Show filters with swipe-down effect
+        // console.log('Showing filters');
+        filterDiv.style.display = "block";
+        let height = filterDiv.scrollHeight;
+        filterDiv.style.height = '0'; // Set initial height to 0
+        setTimeout(() => {
+          filterDiv.style.height = height + 'px'; // Expand height
+        }, 10); // Delay to ensure the element is visible before transitioning
+        toggleFilterButton.innerText = "Hide filters";
+        toggleFilterButton.classList.remove("btn-primary");
+        toggleFilterButton.classList.add("btn-secondary");
       }
 
       function submitFilters() {
@@ -89,12 +141,55 @@
         }
       }
 
+      function submitLogin() {
+        // Get the value of the uname input field
+        var username = document.getElementById("uname").value;
+
+        // Save the username to local storage
+        localStorage.setItem("username", username);
+
+        // Remove the text from the uname input field
+        document.getElementById("uname").value = "";
+
+        // Run login to hide the dropdown
+        login();
+        showCorrectLoginButton();
+      }
+
+      function logout() {
+        localStorage.setItem("username", "");
+        showCorrectLoginButton();
+      }
+
+      function showCorrectLoginButton() {
+        let username = localStorage.getItem("username");
+        let loginButton = document.getElementById("login-btn");
+        let logoutButton = document.getElementById("logout-btn");
+        console.log("username: " + username);
+        console.log("username.length: " + username.trim().length);
+
+        if (username && username.trim().length > 0) {
+          console.log("user is logged in")
+          // user is logged in
+          logoutButton.style.display = "block";
+          loginButton.style.display = "none";
+        } else {
+          logoutButton.style.display = "none";
+          loginButton.style.display = "block";
+        }
+      }
     </script>
 
     <main>
         <% if (data.length > 0) { %>
             <div>
-                <button onclick="toggleShowFilters()" type="button"  id="filter-btn" class="btn btn-primary mb-2 btn-sm">Show filters</button>
+                <div class="d-flex justify-content-between">
+                    <button onclick="toggleShowFilters()" type="button"  id="filter-btn" class="btn btn-primary mb-2 btn-sm">Show filters</button>
+<!--                    only runs at page load, so works for initially showing the right button -->
+                    <button onclick="logout()" type="button" id="logout-btn" class="btn btn-danger mb-2 btn-sm">Logout</button>
+                    <button onclick="login()" type="button" id="login-btn" class="btn btn-primary mb-2 btn-sm">Login</button>
+                    <script>showCorrectLoginButton()</script>
+                </div>
                 <div class="" id="filters" style="display: none;">
                     <div class="d-flex justify-content-between">
                         <div>
@@ -121,6 +216,17 @@
                         <div class="d-flex flex-column-reverse">
                             <button onclick="submitFilters()" type="button" id="apply-btn" class="btn btn-success btn-sm mb-2">Submit</button>
                         </div>
+                    </div>
+                </div>
+                <div class="" id="login" style="display: none;">
+                    <div class="d-flex align-items-center">
+<!--                        <form action="login" method="post" class="d-flex align-items-center">-->
+                        <label for="uname" class="mr-2">Username:</label>
+                        <input type="text" id="uname" name="uname" class="form-control">
+
+<!--                        <input type="button" value="Submit"  class="btn btn-success btn-sm ml-2">-->
+                        <button onclick="submitLogin()" type="button" id="login-btn" class="btn btn-success btn-sm ml-2">Submit</button>
+<!--                        </form>-->
                     </div>
                 </div>
             </div>
