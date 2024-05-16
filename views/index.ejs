@@ -128,6 +128,7 @@
         <div id="plant-container">
             <% if (data.length > 0) { %>
                 <% data.forEach(plant => { %>
+                    <% console.log("Rendering: " + plant._id); %>
                     <div id="div-<%= plant._id %>" class="mb-2 border border-dark rounded p-2 plant">
 <!--                        for filtering -->
                         <input type="checkbox" id="filter-flowers" name="flowers" <% if (plant.flowers) { %> checked <% } %> hidden>

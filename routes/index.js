@@ -51,12 +51,12 @@ router.get('/', function(req, res, next) {
   result.then(plants => {
     let data = JSON.parse(plants);
     console.log(data.length + " plants in database");
-    console.log("Data: " + data);
-    data.sort(compareDateTime);
+    console.log("Data: " + data[0]);
+    // data.sort(compareDateTime);
     res.render('index', {
       title: jsonEntry.title,
       site_name: 'Plantpedia',
-      data: data.sort(compareDateTime),
+      data: data,
       path: jsonEntry.path
     });
   });
