@@ -57,10 +57,16 @@ router.get('/', function(req, res, next) {
       title: jsonEntry.title,
       site_name: 'Plantpedia',
       data: data,
-      path: jsonEntry.path
+      path: jsonEntry.path,
+      isLoggedIn: false
     });
   });
 });
+
+router.post('/login', function (req, res, next) {
+  let username = req.body.uname;
+  res.render('index', { title: 'COM3504/3604', login_is_correct: false });
+})
 
 // route to get all todos
 
