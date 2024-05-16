@@ -45,7 +45,7 @@ exports.create = function (userData, filePath, date, time, chatId, comments, lon
 // Function to get all plants
 exports.getAll = function () {
   // Retrieve all plants from the database
-  return plantModel.find({}).then(plants => {
+  return plantModel.find({}).sort({date : 1}).then(plants => {
     // Return the list of plants as a JSON string
     return JSON.stringify(plants);
   }).catch(err => {

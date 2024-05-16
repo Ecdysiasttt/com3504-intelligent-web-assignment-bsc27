@@ -133,7 +133,7 @@
                         <strong>Name:</strong> <%=
                             species != null ?
                                     species + " " + (genus != null ? genus : "")
-                                    : (taxonomy != null ? taxonomy : "Error" ) %>
+                                    : (taxonomy != null ? taxonomy : plant.name ) %>
                     </p>
                     <p class="mb-1"><strong>Description:</strong></p>
                     <p><%= comment %></p>
@@ -179,7 +179,7 @@
                     <!--TODO - Fix comments send to wrong plant if receiver opens new chatroom -->
                     <button
                         onclick="toggleComments('<%= plant.chatId%>', '<%= plant.uname%>');"
-                        class="btn btn-primary"
+                        class="btn btn-primary mb-2"
                     ><i class="fa-regular fa-comments align-middle mr-2"
                         title="Comments:"></i> Comments</button>
                     <div id="chat_interface-<%= plant.chatId%>" style="display: none">

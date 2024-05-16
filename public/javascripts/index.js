@@ -18,6 +18,7 @@ let marker;
 let map;
 
 
+// TODO no references - delete this?
 const insertPlantInList = (plant) => {
     if (!plant) {
         console.error('Plant data is undefined or null');

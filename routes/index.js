@@ -28,6 +28,22 @@ router.get('/plants', function (req, res, next) {
   });
 });
 
+function compareDateTime(a, b) {
+  console.log("huio");
+  // Parse date and time strings to create Date objects
+  let dateA = new Date(a.date + ' ' + a.time);
+  let dateB = new Date(b.date + ' ' + b.time);
+
+  // Compare the Date objects
+  if (dateA < dateB) {
+    return -1; // dateA comes before dateB
+  } else if (dateA > dateB) {
+    return 1; // dateA comes after dateB
+  } else {
+    return 0; // dates are equal
+  }
+}
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   let result = plants.getAll();
@@ -35,10 +51,12 @@ router.get('/', function(req, res, next) {
   result.then(plants => {
     let data = JSON.parse(plants);
     console.log(data.length + " plants in database");
+    console.log("Data: " + data);
+    data.sort(compareDateTime);
     res.render('index', {
       title: jsonEntry.title,
       site_name: 'Plantpedia',
-      data: data,
+      data: data.sort(compareDateTime),
       path: jsonEntry.path
     });
   });

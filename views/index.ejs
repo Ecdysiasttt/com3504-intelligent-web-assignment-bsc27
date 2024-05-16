@@ -50,17 +50,12 @@
 
       function submitFilters() {
         console.log("Applying filters");
-        // get all the checkboxes
-        let isFlowersSelected = document.getElementById('filter-flowers').checked;
-        let isLeavesSelected = document.getElementById('filter-leaves').checked;
-        let isFruitSelected = document.getElementById('filter-fruit').checked;
-        let isSeedsSelected = document.getElementById('filter-seeds').checked;
 
         let filters = [
-          isFlowersSelected,
-          isLeavesSelected,
-          isFruitSelected,
-          isSeedsSelected
+          document.getElementById('filter-flowers').checked,    // isFlowersSelected
+          document.getElementById('filter-leaves').checked,     // isLeavesSelected
+          document.getElementById('filter-fruit').checked,      // isFruitSelected
+          document.getElementById('filter-seeds').checked       // isSeedsSelected
         ];
 
         let anyFilterSelected = filters.some(value => value === true); // false if no filter is selected
@@ -68,16 +63,10 @@
         // get all plant divs
         let allPlants = document.getElementsByClassName("plant");
 
-        console.log("Num plants: " + allPlants.length);
-
         // Iterate over each plant div
         for (let i = 0; i < allPlants.length; i++) {
           let plantDiv = allPlants[i];
           let checkboxes = plantDiv.querySelectorAll('input[type="checkbox"]');
-
-          // plantDiv.style.display = "block";
-
-          // console.log("plant " + i);
 
           // Check if any filter is selected
           if (anyFilterSelected) {
@@ -90,39 +79,13 @@
                 break;
               }
             }
-
             // Set display style based on whether all filters are passed
             plantDiv.style.display = allFiltersPassed ? "block" : "none";
           } else {
             // No filters selected, so display the plant
             plantDiv.style.display = "block";
           }
-
-            // // Iterate over checkboxes within the current plant div
-            // checkboxes.forEach(function(checkbox) {
-            //   // console.log(checkbox);
-            //   // Get the value of the checkbox
-            //   let checkboxValue = checkbox.checked;
-            //
-            //   // Do something with the checkbox value
-            //   console.log("Checkbox value:", checkboxValue);
-            // });
         }
-
-        console.log("Filters selected:");
-        if (isFlowersSelected) {
-          console.log("  Flowers");
-        }
-        if (isLeavesSelected) {
-          console.log("  Leaves");
-        }
-        if (isFruitSelected) {
-          console.log("  Fruit");
-        }
-        if (isSeedsSelected) {
-          console.log("  Seeds");
-        }
-
       }
 
     </script>
