@@ -1,3 +1,6 @@
+/**
+ * Connects to MongoDB database
+ */
 let mongoose = require('mongoose');
 
 // get the schema class from mongoose
@@ -6,7 +9,12 @@ let Schema = mongoose.Schema;
 
 //TODO - Add date/time to each comment as well as necessary metadata?
 
-// define the schema for the student model
+/**
+ * Defines the schema for the comment model
+ * @param {int} chatId  unique id of the chat
+ * @param {int}  userId   unique id of the user
+ * @param {string}  text  contents of the chat
+ */
 let CommentSchema = new Schema(
     {
 
