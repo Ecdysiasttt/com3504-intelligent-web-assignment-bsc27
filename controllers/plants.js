@@ -1,7 +1,35 @@
-// import the plant model
+/**
+ * This is the controller for all new plants created on the application.
+ */
+
+/**
+ * import the plant model
+ */
 const plantModel = require('../models/plants');
 
-// function to create new plant
+/**
+ * Creates a new plant.
+ * @param date  the date of viewing the plant
+ * @param time the time of viewing the plant
+ * @param height the height of the plant
+ * @param spread the spread of the plant
+ * @param flowers whether the plant has flowers
+ * @param flower_colour what colour of flowers the plant has
+ * @param leaves whether the plant has leaves
+ * @param fruit whether the plant has fruits
+ * @param seeds whether the plant has seeds
+ * @param sun sun exposure in the area
+ * @param name name of the plant
+ * @param identification identifiable names and status of the plant
+ * @param dbpedia information obtained from dbpedia
+ * @param photo photo of the plant taken
+ * @param uname user name of the recorder
+ * @param chatID ID of comment linked to viewing
+ * @param comments contents of comments linked to viewing
+ * @param longitude longitude of the location of viewing
+ * @param latitude latitude of the location of viewing
+ * @return the new plant data recorded as JSON string
+ */
 exports.create = function (userData, filePath, date, time, chatId, comments, longitude, latitude) {
   // create a new plant instance using the provided user data
   let plant = new plantModel ({
