@@ -1,3 +1,7 @@
+/** This controller allows users to join the chatroom.
+ * Uses the socket.io package to connect the client and the server.
+ */
+
 exports.init = function(io) {
     io.sockets.on('connection', function (socket) {
         console.log("try");

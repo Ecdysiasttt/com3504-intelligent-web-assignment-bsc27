@@ -1,3 +1,8 @@
+/**
+ * This is the application's main entry point which defines the startup script.
+ */
+
+
 #!/usr/bin/env node
 
 /**
