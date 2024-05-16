@@ -58,21 +58,21 @@ const addNewPlantButtonEventListener = () => {
         };
 
         // Add the plant data to IndexedDB
-        addNewPlantToSync(db, plantData);
+        addNewPlantToIDB(db, plantData);
     });
 
-    navigator.serviceWorker.ready
-      .then(function (serviceWorkerRegistration) {
-          serviceWorkerRegistration.showNotification("Todo App",
-            {body: "Plant added! - " + name})
-            .then(r =>
-              console.log(r)
-            );
-      });
+    // navigator.serviceWorker.ready
+    //   .then(function (serviceWorkerRegistration) {
+    //       serviceWorkerRegistration.showNotification("Todo App",
+    //         {body: "Plant added! - " + name})
+    //         .then(r =>
+    //           console.log(r)
+    //         );
+    //   });
 }
 
-navigator.onload = function () {
-    // Add event listeners to buttons
-    const add_btn = document.getElementById("add_btn");
-    add_btn.addEventListener("click", addNewPlantButtonEventListener);
-}
+// window.onload = function () {
+//     // Add event listeners to buttons
+//     const add_btn = document.getElementById("add_btn");
+//     add_btn.addEventListener("click", addNewPlantButtonEventListener);
+// }

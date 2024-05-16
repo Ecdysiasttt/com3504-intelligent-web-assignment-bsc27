@@ -1,10 +1,10 @@
 importScripts('/javascripts/idb-utility.js');
 importScripts('/javascripts/insert.js');
-let mustSync = false;
 
 const staticAssets = [
     "/",
     '/plants/add',
+    '/plants/validId',
     '/index.js',
     '/javascripts/index.js',
     '/javascripts/insert.js',
@@ -62,6 +62,16 @@ self.addEventListener('fetch', event => {
 
         console.log('Fetching:', event.request.url);
 
+        if (event.request.url.endsWith('/plants/add') && event.request.method === 'GET'){
+            if (cachedResponse)
+                return cache.match(event.request);
+            else
+                try {
+                    return await fetch(event.request);
+                } catch{
+                console.log('Error with getting add plants')
+                }
+        }
 
         // NETWORK FIRST APPROACH
         if (navigator.onLine && event.request.url.endsWith('/plants')) {
@@ -72,11 +82,10 @@ self.addEventListener('fetch', event => {
         }
 
 
-        if (navigator.onLine && event.request.url.endsWith('/plants/add')) {
+        if (navigator.onLine && event.request.url.endsWith('/plants/add') && event.request.method === 'GET') {
             console.log('Add plant to mongoDB');
             const networkResponse = await fetch(event.request);
             return networkResponse;
-
         }
 
         if (navigator.onLine && event.request.url.endsWith('/comments') && event.request.method === 'POST') {
@@ -100,13 +109,21 @@ self.addEventListener('fetch', event => {
             return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
         }
 
-        if (!(navigator.onLine) && event.request.url.endsWith('/plants/add')) {
+        if (!(navigator.onLine) && event.request.url.endsWith('/plants/add') && event.request.method === "GET") {
             console.log('Adding plant to iDB');
             //Get network data from this request
             //Add data to plantsiDB
             //redirect to homepage?
+            return await cache.match(event.request);
         }
 
+        if (event.request.url.endsWith('/validId')) {
+            if (cachedResponse)
+                return cachedResponse;
+            else{
+                console.log('Could not get cached response.');
+            }
+        }
 
         if (cachedResponse) {
             console.log('Service Worker: Fetching from Cache:', event.request.url);
@@ -154,7 +171,7 @@ async function syncData() {
                     'Content-Type': 'application/json'
                 }
             });
-            deleteSyncPlantFromIDB(db, plant.id);
+            deleteSyncPlantFromIDB(db, plant._id);
         }
         console.log('All sync plants have been synchronized');
     } catch (error) {
@@ -177,3 +194,4 @@ self.addEventListener("activate", (event) => {
         })
     );
 });
+

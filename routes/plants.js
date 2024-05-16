@@ -69,6 +69,22 @@ router.post('/add', upload.single('photo'), async function(req, res, next) {
   res.redirect('/');
 });
 
+
+router.get('/validId', async function (req, res, next) {
+  let chatId = Math.floor(Math.random() * 900000 + 100000); // Random number
+
+  // Check if the generated chat ID is valid
+  let valid = await checkIdValid(chatId);
+  while (!valid) {
+    chatId = Math.floor(Math.random() * 900000 + 100000); // Generate a new random number
+    valid = await checkIdValid(chatId);
+  }
+
+  // Send the valid chat ID as a JSON response
+  res.json({ chatId: chatId });
+});
+
+
 router.get('/:plantId', async function (req, res, next) {
 
 

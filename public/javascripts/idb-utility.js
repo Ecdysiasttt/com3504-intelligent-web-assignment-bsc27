@@ -123,6 +123,7 @@ function openSyncPlantsIDB() {
 
         request.onsuccess = function(event) {
             const db = event.target.result;
+            console.log('Opened Sync DB');
             resolve(db);
         };
     });
@@ -146,3 +147,78 @@ const deleteAllExistingPlantsFromIDB = (plantIDB) => {
         });
     });
 };
+
+
+// Function to get all sync plants from the IndexedDB
+const getAllSyncPlants = (syncPlantIDB) => {
+    return new Promise((resolve, reject) => {
+        const transaction = syncPlantIDB.transaction(["sync-plants"]);
+        const plantStore = transaction.objectStore("sync-plants");
+        const getAllRequest = plantStore.getAll();
+
+        getAllRequest.addEventListener("success", () => {
+            resolve(getAllRequest.result);
+        });
+
+        getAllRequest.addEventListener("error", (event) => {
+            reject(event.target.error);
+        });
+    });
+};
+
+// Function to delete a sync plant from IndexedDB
+const deleteSyncPlantFromIDB = (syncPlantIDB, id) => {
+    const transaction = syncPlantIDB.transaction(["sync-plants"], "readwrite");
+    const plantStore = transaction.objectStore("sync-plants");
+    const deleteRequest = plantStore.delete(id);
+
+    deleteRequest.addEventListener("success", () => {
+        console.log("Deleted " + id);
+    });
+
+    deleteRequest.addEventListener("error", (event) => {
+        console.error("Error deleting sync plant from IDB:", event.target.error);
+    });
+};
+
+// Function to add a single plant to IndexedDB
+const addNewPlantToIDB = (plantIDB, plant, store) => {
+    return new Promise((resolve, reject) => {
+        const transaction = plantIDB.transaction([store], "readwrite");
+        const plantStore = transaction.objectStore(store);
+
+        const addRequest = plantStore.add(plant);
+
+        addRequest.addEventListener("success", () => {
+            console.log("Added " + "#" + addRequest.result + ": " + plant.name);
+            resolve();
+        });
+
+        addRequest.addEventListener("error", (event) => {
+            reject(event.target.error);
+        });
+    });
+};
+
+// Function to add multiple plants to IndexedDB
+// const addNewPlantToSyncIDB = (plantIDB, plants) => {
+//     return new Promise((resolve, reject) => {
+//         const transaction = plantIDB.transaction(["plants"], "readwrite");
+//         const plantStore = transaction.objectStore("plants");
+//
+//         const addPromises = plants.map(plant => {
+//             return new Promise((resolveAdd, rejectAdd) => {
+//                 const addRequest = plantStore.add(plant);
+//                 addRequest.addEventListener("success", () => {
+//                     console.log("Added " + "#" + addRequest.result + ": " + plant.name);
+//                     resolveAdd();
+//                 });
+//                 addRequest.addEventListener("error", (event) => {
+//                     rejectAdd(event.target.error);
+//                 });
+//             });
+//         });
+//
+//         Promise.all(addPromises).then(resolve).catch(reject);
+//     });
+// };

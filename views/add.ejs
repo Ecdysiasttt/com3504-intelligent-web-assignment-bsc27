@@ -12,19 +12,23 @@
         <script src="https://kit.fontawesome.com/7f6de5401f.js" crossorigin="anonymous"></script>
         <script src = "https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-        <script src="/javascripts/insert.js"></script>
+<!--        <script src="/javascripts/insert.js"></script>-->
         <script src="../javascripts/index.js"></script>
+        <script src="../javascripts/idb-utility.js"></script>
+        <script src="../index.js"></script>
 
         <script>
             window.onload = function() {
+                console.log('Added even listener.');
+                const add_btn = document.getElementById("add_btn");
+                add_btn.addEventListener("click", addNewPlantButtonEventListener);
                 loadMap();
                 console.log('here');
                 setMapClickable();
             };
+
         </script>
 
-        <script src="../javascripts/idb-utility.js"></script>
-        <script src="../index.js"></script>
 
     </head>
 
@@ -176,7 +180,7 @@
                     <input type="url" class="form-control" name="dbpedia" id="dbpedia" placeholder="https://example.com" pattern="https://.*" required>
                 </div>
 
-                <input id="add_btn" class="new_plant" type="submit" value="Submit">
+                <input id="add_btn" class="new_plant" type="button" value="Submit">
             </form>
         </main>
 

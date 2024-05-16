@@ -194,13 +194,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 function loadMap(){
     //Initialise leaflet map
-    map = L.map('map').setView([0, 0], 13); //Default long/lat of 0,0
+    try {
+        map = L.map('map').setView([0, 0], 13); //Default long/lat of 0,0
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    marker = L.marker([0,0]).addTo(map);
+        marker = L.marker([0, 0]).addTo(map);
+    } catch{
+        console.log('Map not created.');
+    }
 }
 
 function setMapClickable(){
@@ -391,17 +395,135 @@ function loadComments(plantID){
 
 }
 
-//This is still being called for some reason?
-// console.log('here');
-// //TODO set the history for the plant to have the comments from the database (and connect to the room?)
-// fetch(`/plants/${plantID}/comments`, {
-//     method: 'get'
-// }).then(response => {
-//     if (response.ok) {
-//         console.log('Got comments');
-//     } else {
-//         console.log('Could not fetch comments');
-//     }
-// }).catch(error => {
-//     console.log('Error fetching comments:', error);
-// });
+// Date formatting function
+function formatDate(datetime) {
+    const date = datetime.split("T")[0];
+    const splitDate = date.split("-");
+    var year = splitDate[0];
+    var month = splitDate[1];
+    var day = splitDate[2];
+    return day + "/" + month + "/" + year;
+}
+
+// Time formatting function
+function formatTime(datetime) {
+    return datetime.split("T")[1];
+}
+
+const addNewPlantButtonEventListener = () => {
+    if (!validateForm()) {
+        return; // Exit function if form validation fails
+    }
+    fetch('/plants/validId') // Fetch request to generate a valid chat ID
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to generate a valid chat ID');
+            }
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            // Once a valid chat ID is received, proceed with adding the plant to IndexedDB
+            openSyncPlantsIDB().then((db) => {
+
+                const dateTime = document.getElementById('date_time').value.toString();
+
+                const sunRadios = document.querySelectorAll('input[name="sun"]');
+                const idRadios = document.querySelectorAll('input[name="identification"]');
+
+                let sunValue;
+                let idValue;
+
+                sunRadios.forEach(radio => {
+                    if (radio.checked) {
+                        sunValue = radio.value;
+                    }
+                });
+
+                idRadios.forEach(radio => {
+                    if (radio.checked) {
+                        idValue = radio.value;
+                    }
+                });
+                // Create an object representing the plant data
+                const plantData = {
+                    date: formatDate(dateTime),
+                    time: formatTime(dateTime),
+                    height: document.getElementById('height').value,
+                    spread: document.getElementById('spread').value,
+                    flowers: document.getElementById('flowers').checked,
+                    flower_colour: document.getElementById('flower_colour').value,
+                    leaves: document.getElementById('leaves').checked,
+                    fruit: document.getElementById('fruit').checked,
+                    seeds: document.getElementById('seeds').checked,
+                    sun: sunValue,
+                    name: document.getElementById('name').value,
+                    identification: idValue,
+                    dbpedia: document.getElementById('dbpedia').value,
+                    photo: document.getElementById('photo').value,
+                    uname: document.getElementById('uname').value,
+                    chatId: data.chatId,
+                    comments: null,
+                    longitude: document.getElementById('longitude').value,
+                    latitude: document.getElementById('latitude').value
+                };
+
+                // Add the plant data to IndexedDB
+                addNewPlantToIDB(db, plantData, "sync-plants")
+                    .then(() => {
+                        // After successfully adding the plant, redirect to the homepage
+                        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                            navigator.serviceWorker.ready.then(swRegistration => {
+                                swRegistration.sync.register('sync-plant')
+                                    .then(() => {
+                                        console.log('Sync event registered');
+                                        window.location.href = '/';
+                                    })
+                                    .catch(err => {
+                                        console.error('Sync registration failed', err);
+                                    });
+                            });
+                        } else {
+                            window.location.href = '/';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding plant to IndexedDB:', error);
+                    });
+            });
+        });
+};
+
+
+function validateForm() {
+    // Get references to form fields
+    const uname = document.getElementById('uname');
+    const dateTime = document.getElementById('date_time');
+    const height = document.getElementById('height');
+    const spread = document.getElementById('spread');
+    const photo = document.getElementById('photo');
+    const latitude = document.getElementById('latitude');
+    const longitude = document.getElementById('longitude');
+    const name = document.getElementById('name');
+    const dbpedia = document.getElementById('dbpedia');
+
+    // Check if any required field is empty
+    if (
+        uname.value === '' ||
+        dateTime.value === '' ||
+        height.value === '' ||
+        spread.value === '' ||
+        photo.value === '' ||
+        latitude.value === '' ||
+        longitude.value === '' ||
+        name.value === '' ||
+        dbpedia.value === ''
+    ) {
+        // Display an alert or some indication to the user that required fields are missing
+        alert('Please fill out all required fields.');
+        return false; // Prevent form submission
+    }
+
+    // Additional validation logic can be added here if needed
+
+    return true; // Allow form submission
+}
