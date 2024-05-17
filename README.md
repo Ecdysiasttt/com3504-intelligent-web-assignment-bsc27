@@ -5,7 +5,7 @@
 <p><b>Team Bc27</b></p>
 
 ## Brief Description of the Project:
-<p>Welcome to PLANTPEDIA! This is a progressive web application for plant recognition. </p>
+<br>Welcome to PLANTPEDIA! This is a progressive web application for plant recognition. </br>
 <br>Developed as a COM3504 Project, we aim to provide a convenient tool for users to record the details of the plants they have seen in an organised way, and also to look up details of plants more easily.</br>
 <p>We also want to build up a community for plant lovers by allowing convenient interactions between plant viewers by chats and comments.</p>
 
@@ -107,13 +107,13 @@ Below are some examples of what should be displayed by the web app. Any deviatio
 All examples are given in Online mode for simplicity as this is main functionality. Offline may display slightly differently.
 
 An example of the main page and how details are displayed:
-![img.png](img.png)
+<br>![img.png](img.png)</br>
 
 Snippet of the details view:
-![img_1.png](img_1.png)
+<br>![img_1.png](img_1.png)</br>
 
 Snippet of the add plant page:
-![img_2.png](img_2.png)
+<br>![img_2.png](img_2.png)</br>
 
 
 ## Design decisions:
