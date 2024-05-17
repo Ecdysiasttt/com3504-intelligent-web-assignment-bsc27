@@ -89,6 +89,12 @@ http://localhost:3000/
 - Caching 
 - Offline storage in IndexedDB database
 
+### Example of Use
+
+    ```md
+    ![alt text](assets/images/screenshot.png)
+    ```
+
 ## Design decisions:
 - The user interface uses a simple layout and a white background so that the focus is on the photos of the plants.
 - Users can select the locations of the plants on a map or use their geolocation to allow them add plant details after they leave the site
