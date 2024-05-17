@@ -21,7 +21,6 @@
 - [Installation](#installation)
 - [Functionality](#functionality)
 - [Credits](#credits)
-- [License](#license)
 
 
 ## Installation:
@@ -76,13 +75,23 @@ http://localhost:3000/
 - Node.js v22.0.0
 - socket.io v4.5.4
 - Bootstrap v4.5.0
+- Express.js
 
 ## Functionality:
 
-
+- Set up an user account
+- User login and logout
+- Create plant details
+- View all plant details
+- Sort and categorise plants
+- Comment on plants
+- Online storage in MongoDB database
+- Caching 
+- Offline storage in IndexedDB database
 
 ## Design decisions:
-
+- The user interface uses a simple layout and a white background so that the focus is on the photos of the plants.
+- Users can select the locations of the plants on a map or use their geolocation to allow them add plant details after they leave the site
 
 ## Credits:
 <p>Oliver Spacey - ohmspacey1@sheffield.ac.uk</p>
