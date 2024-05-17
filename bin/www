@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Module dependencies.
+ * This is the application's main entry point that defines the startup script.
  */
 
+/**
+ * Module dependencies.
+ */
 var app = require('../app');
 var debug = require('debug')('bsc27-assignment:server');
 var http = require('http');

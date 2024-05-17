@@ -26,7 +26,56 @@
 
 ## Installation:
 
+Node.js version `20.0.0` or above recommended.
 
+### Load Project
+
+```bash
+git clone git@github.com:Ecdysiasttt/com3504-intelligent-web-assignment-bsc27.git
+```
+
+### Move to Project
+
+```bash
+cd com3504-intelligent-web-assignment-bsc2
+```
+
+### Install Packages
+
+```bash
+npm install
+```
+
+### Run Project
+
+```bash
+npm run serve
+```
+
+### Open Project
+
+Enter the following address on your browser.
+
+```bash
+http://localhost:3000/
+```
+
+### Directory of Folders
+
+- bins - entry point of the application
+- controllers
+- databases
+- models
+- node_modules
+- public
+- routes
+- views
+
+## Library and Packages
+
+- Node.js v22.0.0
+- socket.io v4.5.4
+- Bootstrap v4.5.0
 
 ## Functionality:
 

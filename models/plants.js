@@ -1,3 +1,6 @@
+/**
+ * Connects to MongoDB database
+ */
 let mongoose = require('mongoose');
 
 // get the schema class from mongoose
@@ -16,26 +19,30 @@ let CommentSchema = new Schema(
 
 )
 
-// define the schema for the student model
+/**
+ * Defines the schema for the plant model
+ * @param {string} date  the date of viewing the plant
+ * @param {string} time the time of viewing the plant
+ * @param {int} height the height of the plant
+ * @param {int} spread the spread of the plant
+ * @param {bool} flowers whether the plant has flowers
+ * @param {string} flower_colour what colour of flowers the plant has
+ * @param {bool} leaves whether the plant has leaves
+ * @param {bool} fruit whether the plant has fruits
+ * @param {bool} seeds whether the plant has seeds
+ * @param {string} sun sun exposure in the area
+ * @param {string} name name of the plant
+ * @param {string} identification identifiable names and status of the plant
+ * @param {string} dbpedia information obtained from dbpedia
+ * @param {buffer} photo photo of the plant taken
+ * @param {string} uname user name of the recorder
+ * @param {int} chatID ID of comment linked to viewing
+ * @param {schema} comments contents of comments linked to viewing
+ * @param {number} longitude longitude of the location of viewing
+ * @param {number} latitude latitude of the location of viewing
+ */
 let PlantSchema = new Schema(
   {
-    // date             string
-    // time             string
-    // height           int
-    // spread           int
-    // flowers          bool
-    // flower_colour     string
-    // leaves           bool
-    // fruit            bool
-    // seeds            bool
-    // sun              string
-    // name             string
-    // identification   string
-    // dbpedia          string
-    // photo            buffer
-    // uname            string
-    // chatId           int
-
     // define the fields with correct types
     date: {type: String, required: true, max: 100},
     time: {type: String, required: true, max: 100},
@@ -56,7 +63,6 @@ let PlantSchema = new Schema(
     comments: [CommentSchema],
     longitude: {type: Number, required: true},
     latitude: {type: Number, required: true}
-
   }
 );
 
