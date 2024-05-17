@@ -27,17 +27,24 @@
 
 Node.js version `20.0.0` or above recommended.
 
-### Load Project
+[//]: # (### Load Project)
 
-```bash
-git clone git@github.com:Ecdysiasttt/com3504-intelligent-web-assignment-bsc27.git
-```
+[//]: # ()
+[//]: # (```bash)
 
-### Move to Project
+[//]: # (git clone git@github.com:Ecdysiasttt/com3504-intelligent-web-assignment-bsc27.git)
 
-```bash
-cd com3504-intelligent-web-assignment-bsc27
-```
+[//]: # (```)
+
+[//]: # ()
+[//]: # (### Move to Project)
+
+[//]: # ()
+[//]: # (```bash)
+
+[//]: # (cd com3504-intelligent-web-assignment-bsc27)
+
+[//]: # (```)
 
 ### Install Packages
 
@@ -53,7 +60,7 @@ npm run
 ```
 It will be listed similar to:
 
-![img_3.png](img_3.png)
+![img.png](img.png)
 
 In the case shown, the correct command to run the server would be:
 ```bash
@@ -101,19 +108,27 @@ http://localhost:3000/
 - Offline comments and plants sync to mongoDB when online
 - PWA full support - installable to device
 
-### Example of Use
+[//]: # (### Example of Use)
 
-Below are some examples of what should be displayed by the web app. Any deviation from these is not expected, and our contact details are provided below if there is any confusion.
-All examples are given in Online mode for simplicity as this is main functionality. Offline may display slightly differently.
+[//]: # ()
+[//]: # (Below are some examples of what should be displayed by the web app. Any deviation from these is not expected, and our contact details are provided below if there is any confusion.)
 
-An example of the main page and how details are displayed:
-![img.png](img.png)
+[//]: # (All examples are given in Online mode for simplicity as this is main functionality. Offline may display slightly differently.)
 
-Snippet of the details view:
-![img_1.png](img_1.png)
+[//]: # ()
+[//]: # (An example of the main page and how details are displayed:)
 
-Snippet of the add plant page:
-![img_2.png](img_2.png)
+[//]: # (![img.png]&#40;img.png&#41;)
+
+[//]: # ()
+[//]: # (Snippet of the details view:)
+
+[//]: # (![img_1.png]&#40;img_1.png&#41;)
+
+[//]: # ()
+[//]: # (Snippet of the add plant page:)
+
+[//]: # (![img_2.png]&#40;img_2.png&#41;)
 
 
 ## Design decisions:
@@ -129,7 +144,16 @@ Snippet of the add plant page:
 - Plants that are created while offline cannot be viewed in the detailed mode until the website has cached their page. As such, you must return to online FIRST, and then you will be able to view details, add comments, view DBPedia etc.
 
 
+## Github History and Commits:
+The link for our shared repo is:
 
+https://github.com/Ecdysiasttt/com3504-intelligent-web-assignment-bsc27.git
+
+Included here are some screenshots of commit history and contributions:
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+![img_4.png](img_4.png)
 ## Credits:
 <p>Oliver Spacey - ohmspacey1@sheffield.ac.uk</p>
 <p>Harry Scutt - hasscutt1@sheffield.ac.uk</p>
