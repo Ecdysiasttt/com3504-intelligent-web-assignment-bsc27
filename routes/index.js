@@ -11,7 +11,7 @@ var todoController = require('../controllers/todo');
 jsonEntry = {
     "copyright": "BC27",
     "date": "2023-02-09",
-    "explanation": "Vivid and lustrous, wafting iridescent waves of color wash across this skyscape from Kilpisjärvi, Finland. Known as nacreous clouds or mother-of-pearl clouds, they are rare. But their unforgettable appearance was captured looking south at 69 degrees north latitude at sunset on January 24.  A type of polar stratospheric cloud, they form when unusually cold temperatures in the usually cloudless lower stratosphere form ice crystals. Still sunlit at altitudes of around 15 to 25 kilometers, the clouds can diffract sunlight even after sunset and just before the dawn.",
+    "explanation": "",
     "hdurl": "https://apod.nasa.gov/apod/image/2302/PearlCloudDennis7.jpg",
     "media_type": "image",
     "service_version": "v1",
@@ -20,6 +20,7 @@ jsonEntry = {
 }
 
 
+//Returns the plants in the mongoDB
 router.get('/plants', function (req, res, next) {
   plants.getAll().then(plants => {
     console.log(plants);
@@ -30,6 +31,9 @@ router.get('/plants', function (req, res, next) {
   });
 });
 
+
+//First fetches the plants, then displays them - This is overwritten by the insertInList function, however.
+// This is why sometimes the page will flash with other plants before displaying them correctly
 router.get('/', function(req, res, next) {
     // Fetch plants from the /plants endpoint
     fetch('http://localhost:3000/plants')
@@ -55,8 +59,6 @@ router.get('/', function(req, res, next) {
         });
 });
 
-/* GET home page. */
-
 
 //Route for images to cache
 router.get('/images/list', (req, res) => {
@@ -72,6 +74,7 @@ router.get('/images/list', (req, res) => {
     });
 });
 
+// //Old login router
 // router.post('/login', function (req, res, next) {
 //   // console.log("hjiklfhdsakjfhdslakjsdkfladfjkh");
 //   let username = req.body.uname;
@@ -81,7 +84,7 @@ router.get('/images/list', (req, res) => {
 // })
 
 
-// route to add a new todo
+// route to add a new todo - copied from lab code. This is not used, however
 router.post('/add-todo', function(req, res, next) {
     console.log("Received a todo: " + req.body.text);
     todoController.create(req.body).then(todo => {

@@ -23,3 +23,6 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
 } else {
     console.log('Background sync not supported');
 }
+
+
+//This file is solely responsible for registering the service worker and sync event when the page is loaded.

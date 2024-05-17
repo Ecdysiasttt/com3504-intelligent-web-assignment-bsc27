@@ -4,7 +4,7 @@ var plants = require('../controllers/plants');
 var multer = require('multer');
 const Plant = require('../models/plants');
 
-
+//Saving image files to server:
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, '../public/images/uploads/');
@@ -23,6 +23,8 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB
 });
 
+
+//Used for saving the images to server through a fetch
 router.post('/upload', upload.single('photo'), function (req, res, next) {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');
@@ -32,7 +34,7 @@ router.post('/upload', upload.single('photo'), function (req, res, next) {
 });
 
 
-
+//renders the add plants page
 router.get('/add', function(req, res, next) {
   res.render('add', {
     title: 'Add new plant sighting',
@@ -40,10 +42,11 @@ router.get('/add', function(req, res, next) {
   });
 });
 
-//TODO - need logic for offline plant posts with iDB - labs 04/07
 
 
 /* POST plant add form */
+//When plant add is requested (not through form as we use sync iDB, so this is done on the sync function call), then
+//upload the photo to server, and collect all necessary data to add to mongoDB.
 router.post('/add', upload.single('photo'), async function(req, res, next) {
 
   console.log('Attempting to add plant')
@@ -73,7 +76,6 @@ router.post('/add', upload.single('photo'), async function(req, res, next) {
     valid = await checkIdValid(chatId);
   }
 
-
   let result = plants.create(userData, filePath, date, time, chatId, comments, longitude, latitude);
 
   console.log(result);
@@ -81,6 +83,8 @@ router.post('/add', upload.single('photo'), async function(req, res, next) {
   res.redirect('/');
 });
 
+
+//When syncing, fetch this. This route decodes the base64 image and adds it to the server, and then creates a new plant.
 router.post('/sync', async function(req, res, next) {
   try {
     console.log('Attempting to sync plant');
@@ -98,14 +102,12 @@ router.post('/sync', async function(req, res, next) {
     }
 
 
-
     const imageType = matches[1];
     console.log('Image type:')
     console.log(imageType)
     const base64Data = matches[2];
     const buffer = Buffer.from(base64Data, 'base64');
     const blob = new Blob([buffer], { type: imageType });
-
 
     // Create a FormData object and append the image buffer
     const formData = new FormData();
@@ -150,6 +152,8 @@ router.post('/sync', async function(req, res, next) {
 });
 
 
+//This returns a valid chatID for the plant - each plant has a chatID for comments so socket.io knows where to look for the chats
+//and this route guarantees that two plants cannot point to the same socket.io chatroom
 router.get('/validId', async function (req, res, next) {
   let chatId = Math.floor(Math.random() * 900000 + 100000); // Random number
 
@@ -165,6 +169,7 @@ router.get('/validId', async function (req, res, next) {
 });
 
 
+//Gets the detailed view for the plant - only available online and offline for plants that have been synced - as this page must be cached during the sync event
 router.get('/:plantId', async function (req, res, next) {
 
 
@@ -283,6 +288,9 @@ router.get('/:plantId', async function (req, res, next) {
   }
 });
 
+
+//This was my attempt at getting an offline only, uncached router to handle detailed view for newly created plants
+//Could not get it to work, however.
 router.get('/offline', async function (req, res, next) {
   const plantID = req.query.plantId;
 
