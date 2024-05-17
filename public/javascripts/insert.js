@@ -1,3 +1,9 @@
+
+//This file is entirely unused in the final build.
+//Was used like idb-utilityBACKUP - for storing backups of major file changes
+
+
+
 // Date formatting function
 function formatDate(datetime) {
     const date = datetime.split("T")[0];

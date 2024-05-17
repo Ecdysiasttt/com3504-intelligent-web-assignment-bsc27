@@ -52,6 +52,7 @@ function retrieveDataFromIndexedDB() {
     });
 }
 
+//Gets tge plants from the plants iDB
 function getPlantsFromIDB() {
     return new Promise((resolve, reject) => {
         console.log('Attempting to retrieve data from IndexedDB');
@@ -83,8 +84,6 @@ function getPlantsFromIDB() {
 }
 
 
-
-// Functions to handle sync plants as already defined in your code
 
 // Function to open the plants IndexedDB
 function openPlantsIDB() {
@@ -202,6 +201,7 @@ const addNewPlantToIDB = (plantIDB, plant, store) => {
 };
 
 
+//Opens the comments iDB
 async function openCommentsIDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open("sync-comments", 1);
@@ -222,6 +222,9 @@ async function openCommentsIDB() {
         };
     });
 }
+
+
+//Adds a new comment to the newly opened comments iDB
 async function addCommentToIDB(comment) {
     const db = await openCommentsIDB();
     const tx = db.transaction('sync-comments', 'readwrite');
@@ -230,6 +233,7 @@ async function addCommentToIDB(comment) {
 }
 
 
+//Gets comments from comments iDB
 const getCommentsFromIDB = (commentsIDB) => {
 
     return new Promise((resolve, reject) => {
@@ -248,6 +252,7 @@ const getCommentsFromIDB = (commentsIDB) => {
     });
 };
 
+//Used for removing any to-sync comments following a sync event - to stop comments being perpetually added.
 const deleteCommentFromIDB = (commentIDB, id) => {
     const transaction = commentIDB.transaction(["sync-comments"], "readwrite");
     const plantStore = transaction.objectStore("sync-comments");
@@ -262,6 +267,7 @@ const deleteCommentFromIDB = (commentIDB, id) => {
     });
 };
 
+//Adds name variable to differ from similar function in index.js. Needed for offline comment adding
 async function addCommentToPlantDB(plantID, comment, chatId, name) {
 
     console.log('Fetching comment post...', comment)

@@ -48,9 +48,15 @@ self.addEventListener('install', event => {
         console.log('Service Worker: Caching App Shell...');
         try {
             const cache = await caches.open(cacheName);
+
+            //So here I had to make something that could get the dynamically produced pages and cache them
+            //This is done using the two functions below
+            //They return all the plant urls (/plants/:plantId for all plantIds in the mongoDB)
+            //and plantComments urls (/plants/:plantId/comments for the same as above)
             const plantUrls = await fetchPlantUrls();
             const plantComments = await fetchPlantComments(plantUrls);
 
+            //This was needed to collect and cache all the image files so images could be displated offline.
             const imageResponse = await fetch('/images/list');
             const imageUrls = await imageResponse.json();
 
@@ -63,6 +69,10 @@ self.addEventListener('install', event => {
     })());
 });
 
+
+//This fetch listener is quite messy, but it was developed with much difficulty understanding the navigator.onLine function
+//I still don't fully get it - and sometimes an offline page will adamantly declare itself online, which causes major issues.
+//Much of this function is populated with attempts to fix this.
 self.addEventListener('fetch', event => {
     event.respondWith((async () => {
         const cache = await caches.open(cacheName);
@@ -86,7 +96,6 @@ self.addEventListener('fetch', event => {
         }
 
 
-
         if (event.request.url.endsWith('/upload')){
             await fetch(event.request)
                 .then(function(response) {
@@ -99,6 +108,9 @@ self.addEventListener('fetch', event => {
         }
 
         // NETWORK FIRST APPROACH
+        //Below are a set of specific fetch-cases and how they should be handled. I did this because i was having issues with the service worker
+        //and with navigator.onLine thinking it was online when it wasn't...
+
         if (navigator.onLine && event.request.url.endsWith('/plants')) {
             console.log('Fetching data for /plants from mongoDB');
             //get latest from mongoDB
@@ -169,7 +181,7 @@ self.addEventListener('fetch', event => {
             // Cache the new request if it's an image or manifest.json
             if (event.request.url.includes('/public/images/') || event.request.url.endsWith('/manifest.json')) {
                 console.log('Caching new request:', event.request.url);
-                cache.put(event.request, networkResponse.clone());
+                await cache.put(event.request, networkResponse.clone());
             }
 
             return networkResponse;
@@ -183,13 +195,15 @@ self.addEventListener('fetch', event => {
 
 
 
-
+//Sync event listener - triggers the sync function
 self.addEventListener('sync', event => {
     if (event.tag === 'sync-plant') {
         event.waitUntil(syncData());
     }
 });
 
+
+//Sync function - syncs all plants in sync-plants (offline added plants) and then syncs all comments from offline
 async function syncData() {
     if (!navigator.onLine) {
         console.warn('Network is offline. Sync postponed.');
@@ -226,14 +240,7 @@ async function syncData() {
             }
         }
 
-        //For each comment in comments, add to the plant.comments with the matching plant._id === comment.plantId
-        //        const requestBody = {
-        //             text: comment,
-        //             user: name,
-        //             plantId: plantID,
-        //             chatId: chatId
-        //         };
-
+        //For each comment in comments, add to the plantdb
         for (const comment of comments) {
             try {
                 const plantID = comment.plantId;
@@ -254,6 +261,8 @@ async function syncData() {
     }
 }
 
+
+//When new plant pages are created, fetch them and ensure they are properly cached
 async function fetchAndCacheNewPlantPages() {
     try {
         const response = await fetch('/plants/api/plants/ids');

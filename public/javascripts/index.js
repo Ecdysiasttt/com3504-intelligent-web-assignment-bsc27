@@ -18,7 +18,7 @@ let marker;
 let map;
 
 
-// TODO no references - delete this?
+//To display plants normally
 const insertPlantInList = (plant) => {
     if (!plant) {
         console.error('Plant data is undefined or null');
@@ -72,9 +72,7 @@ const insertPlantInList = (plant) => {
                     <a href="/plants/${plant._id}" class="mb-2 btn btn-outline-primary">View details</a>
                 </div>
                 <div>
-                    <button onclick="removePlant('${plant._id}');" href="/" class="btn btn-outline-danger">
-                        Delete
-                    </button>
+
                 </div>
             </div>
         `;
@@ -84,6 +82,7 @@ const insertPlantInList = (plant) => {
     }
 };
 
+//This is for offline plants that have been newly added - does not include photo or view details button.
 const insertSyncPlantInList = (plant) => {
     if (!plant) {
         console.error('Plant data is undefined or null');
@@ -137,9 +136,6 @@ const insertSyncPlantInList = (plant) => {
 <!--                    <a class="mb-2 btn btn-outline-primary">Cannot view details while offline</a>-->
                 </div>
                 <div>
-                    <button onclick="removePlant('${plant.id}');" href="/" class="btn btn-outline-danger">
-                        Delete
-                    </button>
                 </div>
             </div>
         `;
@@ -162,26 +158,7 @@ function init() {
 
 }
 
-// async function fetchPlants() {
-//     if (navigator.onLine) {
-//         // Fetch plants from MongoDB and store in IndexedDB
-//         console.log('Online mode');
-//         const response = await fetch('http://localhost:3000/plants');
-//         const newPlants = await response.json();
-//         const db = await openPlantsIDB();
-//         await deleteAllExistingPlantsFromIDB(db);
-//         await addNewPlantsToIDB(db, newPlants);
-//         return newPlants;
-//     } else {
-//         // Fetch plants from IndexedDB
-//         console.log('Offline mode');
-//         const db = await openPlantsIDB();
-//         let newPlants = await getPlantsFromIDB();
-//         console.log('NEW PLANTS: ', newPlants);
-//         return newPlants;
-//     }
-// }
-
+//Depending on the online status, find where/what to grab
 async function fetchPlants() {
     if (navigator.onLine) {
         // Fetch plants from MongoDB and store in IndexedDB
@@ -206,6 +183,7 @@ async function fetchPlants() {
     }
 }
 
+//Fetch plants and render index page using them
 async function fetchAndRenderIndexPage() {
     const { normalPlants, syncPlants } = await fetchPlants();
     console.log('Online:', navigator.onLine);
@@ -213,6 +191,7 @@ async function fetchAndRenderIndexPage() {
     renderIndexPage({ normalPlants, syncPlants });
 }
 
+//Render index page with given plants ('normal' are the online plants, 'sync' are the offline plants)
 function renderIndexPage({ normalPlants, syncPlants }) {
     const container = document.getElementById('plant-container');
     container.innerHTML = ''; // Clear existing content
@@ -221,10 +200,13 @@ function renderIndexPage({ normalPlants, syncPlants }) {
 }
 
 
+//When page is loaded, get plants and render them to screen.
 document.addEventListener('DOMContentLoaded', function () {
     // Call fetchAndRenderIndexPage when the DOM content is loaded
     fetchAndRenderIndexPage();
 });
+
+//Initialise the map and relevant data - added try catch to be safe, but should never error as leaflet is cached.
 function loadMap(){
     //Initialise leaflet map
     try {
@@ -240,6 +222,8 @@ function loadMap(){
     }
 }
 
+//Allows the user to click and place marker on map when this is called. This function is called in /add, but not for viewing
+//detailed plants, and as such the user cannot move the marker on viewing plants.
 function setMapClickable(){
     //Set click event
     map.on('click', function (e) {
@@ -253,10 +237,14 @@ function setMapClickable(){
     })
 }
 
+
+//Set the marker to a given location
 function setMarker(latitude, longitude){
     marker.setLatLng([latitude, longitude]);
 }
 
+
+//Set the map view to a given location (event is here to stop the forms from submitting (/add) when the button is pressed - this was an issue)
 function setMapView(event, latitude, longitude){
     if(event){
         event.preventDefault();
@@ -267,6 +255,8 @@ function setMapView(event, latitude, longitude){
         map.setView([0, 0], 13);
 }
 
+
+//set the view to the current longitude and latitude
 function setAtGetMapPos(event){
     var latitude = document.getElementById("latitude").value;
     var longitude = document.getElementById("longitude").value;
@@ -275,6 +265,7 @@ function setAtGetMapPos(event){
 }
 
 
+//set the marker to the current longitude and latitude
 function setAtGetPos() {
     var latitude = document.getElementById("latitude").value;
     var longitude = document.getElementById("longitude").value;
@@ -284,25 +275,25 @@ function setAtGetPos() {
 
 
 
+//---Comments stuff---
+
+//Sends the chat via socket so all users can see it
 function sendChatText(text, chatId) {
     if (text.value.toString() !== "") {
         socket.emit('chat', chatId, name, text.value);
     }
     console.log('Sending to room:', chatId);
-
-    // let result = comments.create(chatId, name, text.value);
-    // console.log(result);
 }
 
+//Connects to the plant-specific chatroom for live chatting
 function connectToRoom(chatId) {
     roomNo = chatId;
     if (!name) name = 'Unknown-' + Math.random();
     socket.emit('create or join', chatId, name);
-    // console.log('Connecting to room:', chatId);
-
 }
 
-//TODO - probably want to delete the 'rooms' stuff because it really doesn't do much right now. Leaving in for now as it isn't *harming* anything
+//Toggle the comments section visible/invisible to the user (when selecting 'view comments')
+//rooms was an old variable, but I am leaving it here for longevity - it may prove useful
 function toggleComments(chatId, uname) {
     const chatInterface = document.getElementById("chat_interface-" + chatId.toString());
     if (chatInterface.style.display === "none") {
@@ -310,10 +301,6 @@ function toggleComments(chatId, uname) {
         connectToRoom(chatId, uname);
         if (!rooms.includes(chatId))
             rooms.push(chatId);
-
-        console.log(rooms);
-
-        // socket.emit('connect to all', rooms, name);
     }
     else {
         chatInterface.style.display = "none";
@@ -324,10 +311,9 @@ function toggleComments(chatId, uname) {
     }
 }
 
+//Add the new chat message to the comment history and set the value in the user's chat box to empty (they don't need to
+//delete the chat entry themselves before sending another)
 function writeOnHistory(text, id) {
-    //TODO - Not loading history correctly? Comments only appear after opening for first time (reloading page deletes all message history)
-    //Might be something to do with DB...
-
     let history = document.getElementById('history-' + id.toString());
     let paragraph = document.createElement('p');
     paragraph.innerHTML = text;
@@ -336,6 +322,7 @@ function writeOnHistory(text, id) {
 }
 
 
+//Gets the current location of the navigator and sets this to the values for the map stuff above
 function getLocation(event) {
     event.preventDefault();
     if (navigator.geolocation) {
@@ -358,6 +345,9 @@ function getLocation(event) {
 }
 
 
+//THIS IS NOT USED IN SUBMISSION BUILD
+//I have kept it here as I don't see a reason to remove it - but it is unused for the build of the web page we are submitting
+//(not in requirements to delete plants, it was just useful for debugging and testing things)
 function removePlant(id){
 
     fetch(`/plants/${id}`, {
@@ -375,12 +365,13 @@ function removePlant(id){
 
 }
 
-
+//Adds the given comment to the plant in the database with the matching plantID through a fetch request.
+//This differs from the function 'addCommentToPlantDB' in idb-utility as this only uses 3 params.
 async function addCommentToPlantDBIndex(plantID, comment, chatId) {
 
     console.log('Fetching comment post...', comment)
 
-
+    //When user is online, perform normal database posting operations
     if (navigator.onLine) {
         console.log('Online commenting');
         const requestBody = {
@@ -404,6 +395,9 @@ async function addCommentToPlantDBIndex(plantID, comment, chatId) {
         }).catch(error => {
             console.log('Error fetching post for comment:', error);
         });
+
+    // When user is offline, create a new kind of request body and add this to the comments iDB, then manually add comment to chat history
+        //must be manual as socket will not respond
     } else {
         const requestBody = {
             text: comment,
@@ -420,6 +414,9 @@ async function addCommentToPlantDBIndex(plantID, comment, chatId) {
 }
 
 
+//given the plantID for a plant, load its comments
+//if online, use the fetch request only
+//if offline, use fetch request (for cached response) and load relevant comments from comments iDB
 async function loadComments(plantID){
 
     //Check online status
@@ -449,13 +446,9 @@ async function loadComments(plantID){
             try{
                 const db = await openCommentsIDB();
                 const idbComments = await getCommentsFromIDB(db);
-                console.log(idbComments);
-                // const foundComments = await idbComments.find(comment => comment.plantId === plantID);
                 const filteredComments = idbComments.filter(comment => comment.plantId === plantID);
-                const comments = filteredComments // Extract comments from idbComments or use an empty arra// y if not found
-                // const chatId = foundComments.chatId;
+                const comments = filteredComments
 
-                // let history = document.getElementById('history-' + plantID.toString());
                 comments.forEach(comment => {
                     writeOnHistory(`<b> ${comment.user}: </b> ${comment.text}`, comment.chatId);
                 });
@@ -463,15 +456,7 @@ async function loadComments(plantID){
             catch(error){
                 console.error('Error fetching comments from IndexedDB:', error);
             }
-
-        //remove plantId from comments - make them only contain text and userId.
-        //const finalComments = ...
-
-
     }
-
-
-
 }
 
 // Date formatting function
@@ -489,6 +474,9 @@ function formatTime(datetime) {
     return datetime.split("T")[1];
 }
 
+
+//Used for saving image data - needed for offline post functionality so that when syncing, images could be saved as expected
+//using their image data.
 const readFileAsBase64 = (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -500,6 +488,8 @@ const readFileAsBase64 = (file) => {
     });
 };
 
+
+//When the button to add a new plant is pressed, check if the form fields are all complete, then do all necessary set up
 const addNewPlantButtonEventListener = async () => {
     if (!validateForm()) {
         return; // Exit function if form validation fails
@@ -566,31 +556,8 @@ const addNewPlantButtonEventListener = async () => {
                     photo: photoBase64 // Use the base64-encoded image
                 };
 
-                // const offlineData = {
-                //     date: formatDate(dateTime),
-                //     time: formatTime(dateTime),
-                //     height: document.getElementById('height').value,
-                //     spread: document.getElementById('spread').value,
-                //     flowers: document.getElementById('flowers').checked,
-                //     flower_colour: document.getElementById('flower_colour').value,
-                //     leaves: document.getElementById('leaves').checked,
-                //     fruit: document.getElementById('fruit').checked,
-                //     seeds: document.getElementById('seeds').checked,
-                //     sun: sunValue,
-                //     name: document.getElementById('name').value,
-                //     identification: idValue,
-                //     dbpedia: document.getElementById('dbpedia').value,
-                //     uname: document.getElementById('uname').value,
-                //     chatId: data.chatId,
-                //     comments: null,
-                //     longitude: document.getElementById('longitude').value,
-                //     latitude: document.getElementById('latitude').value,
-                //     photo: null // Use the base64-encoded image
-                // };
-
                 // Add the plant data to IndexedDB
                 await addNewPlantToIDB(db, plantData, "sync-plants");
-                // await addNewPlantToIDB(iDB, offlineData, "plants");
 
                 // Register sync event if service worker is supported
                 if ('serviceWorker' in navigator && 'SyncManager' in window) {
@@ -609,7 +576,7 @@ const addNewPlantButtonEventListener = async () => {
 };
 
 
-
+//Checks that the form fields are all populated
 function validateForm() {
     // Get references to form fields
     const uname = document.getElementById('uname');
@@ -634,12 +601,10 @@ function validateForm() {
         name.value === '' ||
         dbpedia.value === ''
     ) {
-        // Display an alert or some indication to the user that required fields are missing
+        // Display an alert to the user that required fields are missing
         alert('Please fill out all required fields.');
         return false; // Prevent form submission
     }
 
-    // Additional validation logic can be added here if needed
-
-    return true; // Allow form submission
+    return true;
 }
