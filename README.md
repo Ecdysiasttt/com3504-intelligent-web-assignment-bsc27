@@ -2,7 +2,7 @@
 
 ## COM3504 Assignment 
 ### May 2024
-<p><b>Team Bc27</p></b>
+<p><b>Team Bc27</b></p>
 
 ## Brief Description of the Project:
 <p>Welcome to PLANTPEDIA! This is a progressive web application for plant recognition. </p>
@@ -11,9 +11,9 @@
 
 
 ### Authors:
-<p><b>Oliver Spacey</p></b>
-<p><b>Harry Scutt</p></b>
-<p><b>Wan Chi Leung</p></b>
+<p><b>Oliver Spacey</b></p>
+<p><b>Harry Scutt</b></p>
+<p><b>Wan Chi Leung</b></p>
 
 
 ## Table of Contents
@@ -114,6 +114,7 @@ Snippet of the details view:
 
 Snippet of the add plant page:
 ![img_2.png](img_2.png)
+
 
 ## Design decisions:
 - The user interface uses a simple layout and a white background so that the focus is on the photos of the plants.
