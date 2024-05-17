@@ -84,6 +84,72 @@ const insertPlantInList = (plant) => {
     }
 };
 
+const insertSyncPlantInList = (plant) => {
+    if (!plant) {
+        console.error('Plant data is undefined or null');
+        return;
+    }
+    if (!plant.name || !plant.id) {
+        console.error('Required properties missing in plant data:', plant);
+        return;
+    }
+
+    if (plant.name) {
+        const container = document.getElementById("plant-container");
+
+        const div = document.createElement("div");
+        div.id = `div-${plant.id}`;
+        div.classList.add("mb-2", "border", "border-dark", "rounded", "p-2", "plant");
+
+        // Construct the HTML content for the plant
+        div.innerHTML = `
+            <!-- for filtering -->
+            <input type="checkbox" id="filter-flowers" name="flowers" ${plant.flowers ? 'checked' : ''} hidden>
+            <input type="checkbox" id="filter-leaves" name="leaves" ${plant.leaves ? 'checked' : ''} hidden>
+            <input type="checkbox" id="filter-fruit" name="fruit" ${plant.fruit ? 'checked' : ''} hidden>
+            <input type="checkbox" id="filter-seeds" name="seeds" ${plant.seeds ? 'checked' : ''} hidden>
+            <!-- meta-info: name, found by, found on... -->
+            <div class="border-bottom border-dark mb-2">
+                <div class="d-flex justify-content-between align-items-baseline">
+                    <h4 class="mb-2">${plant.name}</h4> <!-- plant name -->
+                    <i class="fa-solid align-middle ${plant.identification.toLowerCase() === 'complete' ? 'fa-circle-check': 'fa-circle-xmark'}"
+                        style="color: ${plant.identification.toLowerCase() === 'complete' ? '#198754': '#9e9e9e'}"
+                        title="Plant identification ${plant.identification.toLowerCase()}">
+                    </i>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <p class="mb-2">
+                        <i class="fa-solid fa-magnifying-glass align-middle" title="Date spotted"></i> ${plant.time} - ${plant.date}
+                    </p>
+                    <p class="mb-2">
+                        ${plant.uname}
+                        <i class="fa-solid fa-user align-middle" title="User"></i>
+                    </p> <!-- spotted by -->
+                </div>
+            </div>
+            <div class="d-flex justify-content-center border-bottom border-dark mb-3" id="info-div-${plant.id}">
+                <div id="right-panel" class="mb-2">
+                    <p>Photo not available offline</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div>
+<!--                    <a class="mb-2 btn btn-outline-primary">Cannot view details while offline</a>-->
+                </div>
+                <div>
+                    <button onclick="removePlant('${plant.id}');" href="/" class="btn btn-outline-danger">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Append the constructed div to the container
+        container.appendChild(div);
+    }
+};
+
+
 function init() {
     //Create user info - unique name and function to add message to history when sent
     name = "User-" + Math.floor(Math.random() * 90000 + 100000);
@@ -94,45 +160,27 @@ function init() {
         });
     }
 
-    //check if online. if online, save current plants to iDB
-
-    // if (navigator.onLine) {
-    //     //fetch plants from mongoDB
-    //     //store in iDB
-    //     console.log('Online mode')
-    //     fetch('http://localhost:3000/plants')
-    //         .then(function (res) {
-    //             return res.json();
-    //         }).then(function (newPlants) {
-    //         openPlantsIDB().then((db) => {
-    //             // console.log(newPlants);
-    //             deleteAllExistingPlantsFromIDB(db).then(() => {
-    //                 addNewPlantsToIDB(db, newPlants).then(() => {
-    //                     console.log("All new plants added to IDB")
-    //                 })
-    //             });
-    //         });
-    //     });
-    //     // fetch('http://localhost:3000/').then(function(res) {
-    //     //    res.render()
-    //     // });
-    //
-    // } else {
-    //     //fetch plants from iDB
-    //     //use these instead
-    //     console.log("Offline mode")
-    //     // fetch('http://localhost:3000/fetch')
-    //     // openPlantsIDB().then((db) => {
-    //     //     getAllPlants(db).then((plants) => {
-    //     //         for (const plant of plants) {
-    //     //             insertPlantInList(plant)
-    //     //         }
-    //     //     });
-    //     // });
-
-    // }
-
 }
+
+// async function fetchPlants() {
+//     if (navigator.onLine) {
+//         // Fetch plants from MongoDB and store in IndexedDB
+//         console.log('Online mode');
+//         const response = await fetch('http://localhost:3000/plants');
+//         const newPlants = await response.json();
+//         const db = await openPlantsIDB();
+//         await deleteAllExistingPlantsFromIDB(db);
+//         await addNewPlantsToIDB(db, newPlants);
+//         return newPlants;
+//     } else {
+//         // Fetch plants from IndexedDB
+//         console.log('Offline mode');
+//         const db = await openPlantsIDB();
+//         let newPlants = await getPlantsFromIDB();
+//         console.log('NEW PLANTS: ', newPlants);
+//         return newPlants;
+//     }
+// }
 
 async function fetchPlants() {
     if (navigator.onLine) {
@@ -143,29 +191,35 @@ async function fetchPlants() {
         const db = await openPlantsIDB();
         await deleteAllExistingPlantsFromIDB(db);
         await addNewPlantsToIDB(db, newPlants);
-        return newPlants;
+        return { normalPlants: newPlants, syncPlants: [] };
     } else {
-        // Fetch plants from IndexedDB
+        // Fetch plants from both IndexedDBs
         console.log('Offline mode');
-        const db = await openPlantsIDB();
-        let newPlants = await getPlantsFromIDB();
-        console.log('NEW PLANTS: ', newPlants);
-        return newPlants;
+        const normalDB = await openPlantsIDB();
+        const syncDB = await openSyncPlantsIDB();
+        const normalPlants = await getPlantsFromIDB(normalDB);
+        const syncPlants = await getAllSyncPlants(syncDB);
+        // syncPlants.forEach(plant => plant.photo = null); // Remove photo for sync plants
+        console.log('Normal Plants: ', normalPlants);
+        console.log('Sync Plants: ', syncPlants);
+        return {normalPlants, syncPlants};
     }
 }
 
 async function fetchAndRenderIndexPage() {
-    const plants = await fetchPlants();
+    const { normalPlants, syncPlants } = await fetchPlants();
     console.log('Online:', navigator.onLine);
-    console.log(plants);
-    renderIndexPage(plants);
+    console.log({ normalPlants, syncPlants });
+    renderIndexPage({ normalPlants, syncPlants });
 }
 
-function renderIndexPage(plants) {
+function renderIndexPage({ normalPlants, syncPlants }) {
     const container = document.getElementById('plant-container');
     container.innerHTML = ''; // Clear existing content
-    plants.forEach(insertPlantInList);
+    normalPlants.forEach(insertPlantInList);
+    syncPlants.forEach(insertSyncPlantInList);
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     // Call fetchAndRenderIndexPage when the DOM content is loaded
@@ -322,34 +376,50 @@ function removePlant(id){
 }
 
 
-function addCommentToPlantDB(plantID, comment) {
+async function addCommentToPlantDB(plantID, comment) {
 
     console.log('Fetching comment post...', comment)
 
-    const requestBody = {
-        text: comment,
-        user: name
-    };
-    fetch(`/plants/${plantID}/comments`, {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
 
-    }).then(response => {
-        if (response.ok) {
-            console.log('Got plant');
-        } else {
-            console.log('Could not fetch post for comment');
-        }
-    }).catch(error => {
-        console.log('Error fetching post for comment:', error);
-    });
+    if (navigator.onLine) {
+        console.log('Online commenting');
+        const requestBody = {
+            text: comment,
+            user: name
+        };
+
+        fetch(`/plants/${plantID}/comments`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+
+        }).then(response => {
+            if (response.ok) {
+                console.log('Got plant');
+            } else {
+                console.log('Could not fetch post for comment');
+            }
+        }).catch(error => {
+            console.log('Error fetching post for comment:', error);
+        });
+    } else {
+        const requestBody = {
+            text: comment,
+            user: name,
+            plantId: plantID
+        };
+        console.log('Offline Commenting');
+        await addCommentToIDB(requestBody);
+
+    }
 }
 
 
-function loadComments(plantID){
+async function loadComments(plantID){
+
+    //Check online status
     fetch(`/plants/${plantID}/comments`)
         .then(response => {
             if (!response.ok) {
@@ -370,6 +440,31 @@ function loadComments(plantID){
             console.error('Error fetching comments:', error);
         });
 
+    if(!navigator.onLine){
+        //do the same, but have sw respond with cached comments
+        //then add getCommentsFromIDB to it
+
+        await getCommentsFromIDB()
+            .then(idbComments => {
+                const foundComments = idbComments.result.find(comment => comment.plantId === plantID);
+                const comments = foundComments ? foundComments.result || [] : []; // Extract comments from idbComments or use an empty array if not found
+                const chatId = foundComments ? foundComments.chatId : null;
+
+                let history = document.getElementById('history-' + plantID.toString());
+                comments.forEach(comment => {
+                    writeOnHistory(`<b> ${comment.userId}: </b> ${comment.text}`, chatId);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching comments from IndexedDB:', error);
+            });
+
+        //remove plantId from comments - make them only contain text and userId.
+        //const finalComments = ...
+
+
+    }
+
 
 
 }
@@ -389,10 +484,27 @@ function formatTime(datetime) {
     return datetime.split("T")[1];
 }
 
-const addNewPlantButtonEventListener = () => {
+const readFileAsBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
+
+const addNewPlantButtonEventListener = async () => {
     if (!validateForm()) {
         return; // Exit function if form validation fails
     }
+
+    // Read the image file as base64
+    const photoInput = document.getElementById('photo');
+    const photoFile = photoInput.files[0];
+    const photoBase64 = await readFileAsBase64(photoFile);
+
     fetch('/plants/validId') // Fetch request to generate a valid chat ID
         .then(response => {
             if (!response.ok) {
@@ -400,30 +512,33 @@ const addNewPlantButtonEventListener = () => {
             }
             return response.json(); // Parse the JSON response
         })
-        .then(data => {
+        .then(async data => {
             // Once a valid chat ID is received, proceed with adding the plant to IndexedDB
-            openSyncPlantsIDB().then((db) => {
+            const db = await openSyncPlantsIDB();
+            // const iDB = await openPlantsIDB();
 
-                const dateTime = document.getElementById('date_time').value.toString();
+            const dateTime = document.getElementById('date_time').value.toString();
 
-                const sunRadios = document.querySelectorAll('input[name="sun"]');
-                const idRadios = document.querySelectorAll('input[name="identification"]');
+            const sunRadios = document.querySelectorAll('input[name="sun"]');
+            const idRadios = document.querySelectorAll('input[name="identification"]');
 
-                let sunValue;
-                let idValue;
+            let sunValue;
+            let idValue;
 
-                sunRadios.forEach(radio => {
-                    if (radio.checked) {
-                        sunValue = radio.value;
-                    }
-                });
+            sunRadios.forEach(radio => {
+                if (radio.checked) {
+                    sunValue = radio.value;
+                }
+            });
 
-                idRadios.forEach(radio => {
-                    if (radio.checked) {
-                        idValue = radio.value;
-                    }
-                });
-                // Create an object representing the plant data
+            idRadios.forEach(radio => {
+                if (radio.checked) {
+                    idValue = radio.value;
+                }
+            });
+
+            try {
+                // Prepare plant data with the photo base64 string
                 const plantData = {
                     date: formatDate(dateTime),
                     time: formatTime(dateTime),
@@ -438,39 +553,56 @@ const addNewPlantButtonEventListener = () => {
                     name: document.getElementById('name').value,
                     identification: idValue,
                     dbpedia: document.getElementById('dbpedia').value,
-                    photo: document.getElementById('photo').value,
                     uname: document.getElementById('uname').value,
                     chatId: data.chatId,
                     comments: null,
                     longitude: document.getElementById('longitude').value,
-                    latitude: document.getElementById('latitude').value
+                    latitude: document.getElementById('latitude').value,
+                    photo: photoBase64 // Use the base64-encoded image
                 };
 
+                // const offlineData = {
+                //     date: formatDate(dateTime),
+                //     time: formatTime(dateTime),
+                //     height: document.getElementById('height').value,
+                //     spread: document.getElementById('spread').value,
+                //     flowers: document.getElementById('flowers').checked,
+                //     flower_colour: document.getElementById('flower_colour').value,
+                //     leaves: document.getElementById('leaves').checked,
+                //     fruit: document.getElementById('fruit').checked,
+                //     seeds: document.getElementById('seeds').checked,
+                //     sun: sunValue,
+                //     name: document.getElementById('name').value,
+                //     identification: idValue,
+                //     dbpedia: document.getElementById('dbpedia').value,
+                //     uname: document.getElementById('uname').value,
+                //     chatId: data.chatId,
+                //     comments: null,
+                //     longitude: document.getElementById('longitude').value,
+                //     latitude: document.getElementById('latitude').value,
+                //     photo: null // Use the base64-encoded image
+                // };
+
                 // Add the plant data to IndexedDB
-                addNewPlantToIDB(db, plantData, "sync-plants")
-                    .then(() => {
-                        // After successfully adding the plant, redirect to the homepage
-                        if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                            navigator.serviceWorker.ready.then(swRegistration => {
-                                swRegistration.sync.register('sync-plant')
-                                    .then(() => {
-                                        console.log('Sync event registered');
-                                        window.location.href = '/';
-                                    })
-                                    .catch(err => {
-                                        console.error('Sync registration failed', err);
-                                    });
-                            });
-                        } else {
-                            window.location.href = '/';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error adding plant to IndexedDB:', error);
-                    });
-            });
+                await addNewPlantToIDB(db, plantData, "sync-plants");
+                // await addNewPlantToIDB(iDB, offlineData, "plants");
+
+                // Register sync event if service worker is supported
+                if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                    const swRegistration = await navigator.serviceWorker.ready;
+                    await swRegistration.sync.register('sync-plant');
+                    console.log('Sync event registered');
+                }
+
+                // Redirect to homepage
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to add plant. Please try again.');
+            }
         });
 };
+
 
 
 function validateForm() {

@@ -5,6 +5,8 @@ const staticAssets = [
     "/",
     '/plants/add',
     '/plants/validId',
+    // '/plants/offline',
+    // '/plants/upload',
     '/index.js',
     '/javascripts/index.js',
     '/javascripts/insert.js',
@@ -13,6 +15,11 @@ const staticAssets = [
     '/manifest.json',
     '/images/image_icon.png',
     '/sw.js'
+];
+
+const externalResources = [
+    'https://unpkg.com/leaflet/dist/leaflet.js',
+    'https://unpkg.com/leaflet/dist/leaflet.css'
 ];
 
 const cacheVersion = 1;
@@ -47,10 +54,10 @@ self.addEventListener('install', event => {
             const imageUrls = await imageResponse.json();
 
 
-            await cache.addAll([...staticAssets, ...plantUrls, ...plantComments, ...imageUrls]);
+            await cache.addAll([...staticAssets, ...externalResources, ...plantUrls, ...plantComments, ...imageUrls]);
             console.log(`Added ${cacheName}`);
-        } catch {
-            console.log("Error occurred while caching...");
+        } catch (error){
+            console.log("Error occurred while caching...", error);
         }
     })());
 });
@@ -62,6 +69,10 @@ self.addEventListener('fetch', event => {
 
         console.log('Fetching:', event.request.url);
 
+        if (event.request.url.endsWith('/plants') && event.request.method === 'GET') {
+            await fetchAndCacheNewPlantPages(); // Fetch and cache new plant pages on demand
+        }
+
         if (event.request.url.endsWith('/plants/add') && event.request.method === 'GET'){
             if (cachedResponse)
                 return cache.match(event.request);
@@ -71,6 +82,19 @@ self.addEventListener('fetch', event => {
                 } catch{
                 console.log('Error with getting add plants')
                 }
+        }
+
+
+
+        if (event.request.url.endsWith('/upload')){
+            await fetch(event.request)
+                .then(function(response) {
+                    return response;
+                })
+                .catch(function() {
+                    console.log('Using cache upload instead')
+                  return caches.match(event.request);
+                })
         }
 
         // NETWORK FIRST APPROACH
@@ -98,6 +122,12 @@ self.addEventListener('fetch', event => {
             console.log('Getting Comments ONLINE');
             const networkResponse = await fetch(event.request);
             return networkResponse;
+        }
+
+        if (!navigator.onLine && event.request.url.endsWith('/comments') && event.request.method === "GET") {
+            console.log('Getting Comments OFFLINE');
+            //Get both iDB and
+            return cachedResponse;
         }
 
 
@@ -159,25 +189,67 @@ self.addEventListener('sync', event => {
 });
 
 async function syncData() {
+    if (!navigator.onLine) {
+        console.warn('Network is offline. Sync postponed.');
+        return;
+    }
+
     try {
         const db = await openSyncPlantsIDB();
         const syncPlants = await getAllSyncPlants(db);
 
         for (const plant of syncPlants) {
-            await fetch('/plants/add', {
-                method: 'POST',
-                body: JSON.stringify(plant),
-                headers: {
-                    'Content-Type': 'application/json'
+            try {
+                const response = await fetch('/plants/sync', {
+                    method: 'POST',
+                    body: JSON.stringify(plant),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server responded with status ${response.status}: ${errorText}`);
                 }
-            });
-            deleteSyncPlantFromIDB(db, plant._id);
+
+                await deleteSyncPlantFromIDB(db, plant.id);
+
+
+                console.log(`Plant synchronized and deleted from IDB: ${plant.id}`);
+            } catch (fetchError) {
+                console.error(`Failed to sync plant ${plant.id}:`, fetchError);
+            }
         }
-        console.log('All sync plants have been synchronized');
+
+        console.log('All sync plants have been processed');
     } catch (error) {
         console.error('Error during synchronization', error);
     }
 }
+
+async function fetchAndCacheNewPlantPages() {
+    try {
+        const response = await fetch('/plants/api/plants/ids');
+        const plantIds = await response.json();
+        const newPlantPageUrls = plantIds.map(id => `/plants/${id}`);
+        const cache = await caches.open(cacheName);
+
+        for (const url of newPlantPageUrls) {
+            const cachedResponse = await cache.match(url);
+            if (!cachedResponse) {
+                const newPlantPageResponse = await fetch(url);
+                await cache.put(url, newPlantPageResponse.clone());
+                console.log(`Added ${url} to cache`);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching and caching new plant pages:', error);
+    }
+}
+
+
+
 
 self.addEventListener("activate", (event) => {
     console.log("New SW activating");

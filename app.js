@@ -25,6 +25,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use('/public/images/uploads', express.static(path.join(__dirname, '/public/images/uploads')));
 app.use('/public/images', express.static(path.join(__dirname, '/public/images')));
+app.use(bodyParser.json({limit: '50mb', extended: true}));
+app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
+app.use(bodyParser.text({ limit: '200mb' }));
 // app.use('/css', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/css')));
 
 app.use('/', indexRouter);

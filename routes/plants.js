@@ -4,6 +4,7 @@ var plants = require('../controllers/plants');
 var multer = require('multer');
 const Plant = require('../models/plants');
 
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, '../public/images/uploads/');
@@ -17,7 +18,18 @@ var storage = multer.diskStorage({
     cb(null, filename);
   }
 });
-let upload = multer( { storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50MB
+});
+
+router.post('/upload', upload.single('photo'), function (req, res, next) {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  console.log('New file path:', req.file.path);
+  res.status(200).json({ path: req.file.path });
+});
 
 
 
@@ -67,6 +79,74 @@ router.post('/add', upload.single('photo'), async function(req, res, next) {
   console.log(result);
 
   res.redirect('/');
+});
+
+router.post('/sync', async function(req, res, next) {
+  try {
+    console.log('Attempting to sync plant');
+    const userData = req.body;
+    console.log('Plant data: ', userData);
+
+    if (!userData.photo) {
+      return res.status(400).json({ message: 'No photo data provided' });
+    }
+
+    // Decode the base64 string
+    const matches = userData.photo.match(/^data:(.+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return res.status(400).json({ message: 'Invalid input string' });
+    }
+
+
+
+    const imageType = matches[1];
+    console.log('Image type:')
+    console.log(imageType)
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+    const blob = new Blob([buffer], { type: imageType });
+
+
+    // Create a FormData object and append the image buffer
+    const formData = new FormData();
+    formData.append('photo', blob, {
+      filename: `photo.${imageType.toString().split('/')[1]}`,
+      contentType: imageType,
+    });
+
+    // Upload the photo file first
+    const uploadResponse = await fetch('http://localhost:3000/plants/upload', { // Change URL as necessary
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Error uploading image');
+    }
+
+    const uploadData = await uploadResponse.json();
+    const photoPath = uploadData.path;
+
+    console.log('File path:');
+    console.log(photoPath);
+
+    const date = userData.date;
+    const time = userData.time;
+    const comments = null;
+    const longitude = userData.longitude;
+    const latitude = userData.latitude;
+    const thisLocation = [longitude, latitude];
+    const chatId = userData.chatId;
+
+    // Save plant data to the database
+    let result = await plants.create(userData, photoPath, date, time, chatId, comments, longitude, latitude);
+
+    console.log(result);
+    res.status(200).json({ message: 'Plant synced successfully' });
+  } catch (error) {
+    console.error('Error syncing plant:', error);
+    res.status(500).json({ message: 'Error syncing plant' });
+  }
 });
 
 
@@ -200,6 +280,33 @@ router.get('/:plantId', async function (req, res, next) {
   } catch (error) {
     // Handle any errors
     next(error);
+  }
+});
+
+router.get('/offline', async function (req, res, next) {
+  const plantID = req.query.plantId;
+
+
+  try {
+    // Open IndexedDB connection
+    const db = await openSyncPlantsIDB();
+
+    const plants = await getAllSyncPlants(db);
+
+    //check each for the correct id, store the plant with correct id.
+    const thisPlant = plants.find(plant => plant.id === plantID);
+
+    if (thisPlant) {
+      res.render('plant', { plant: thisPlant });
+    } else {
+      // If the plant with the given ID is not found, return a 404 error
+      res.status(404).send('Plant not found');
+    }
+
+  } catch (error) {
+    // Handle errors, such as if the plant ID doesn't exist in the IDB
+    console.error('Error fetching plant data:', error);
+    res.status(500).send('Error fetching plant data');
   }
 });
 

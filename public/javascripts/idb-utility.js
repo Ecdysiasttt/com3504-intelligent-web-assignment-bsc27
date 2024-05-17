@@ -157,6 +157,7 @@ const getAllSyncPlants = (syncPlantIDB) => {
         const getAllRequest = plantStore.getAll();
 
         getAllRequest.addEventListener("success", () => {
+            console.log('Got all to-sync plants');
             resolve(getAllRequest.result);
         });
 
@@ -200,25 +201,38 @@ const addNewPlantToIDB = (plantIDB, plant, store) => {
     });
 };
 
-// Function to add multiple plants to IndexedDB
-// const addNewPlantToSyncIDB = (plantIDB, plants) => {
-//     return new Promise((resolve, reject) => {
-//         const transaction = plantIDB.transaction(["plants"], "readwrite");
-//         const plantStore = transaction.objectStore("plants");
-//
-//         const addPromises = plants.map(plant => {
-//             return new Promise((resolveAdd, rejectAdd) => {
-//                 const addRequest = plantStore.add(plant);
-//                 addRequest.addEventListener("success", () => {
-//                     console.log("Added " + "#" + addRequest.result + ": " + plant.name);
-//                     resolveAdd();
-//                 });
-//                 addRequest.addEventListener("error", (event) => {
-//                     rejectAdd(event.target.error);
-//                 });
-//             });
-//         });
-//
-//         Promise.all(addPromises).then(resolve).catch(reject);
-//     });
-// };
+
+async function openCommentsIDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("sync-comments", 1);
+
+        request.onerror = function(event) {
+            reject(new Error(`Database error: ${event.target.errorCode}`));
+        };
+
+        request.onupgradeneeded = function(event) {
+            const db = event.target.result;
+            db.createObjectStore('sync-comments', { keyPath: 'id', autoIncrement: true });
+        };
+
+        request.onsuccess = function(event) {
+            const db = event.target.result;
+            console.log('Opened comments DB');
+            resolve(db);
+        };
+    });
+}
+async function addCommentToIDB(comment) {
+    const db = await openCommentsIDB();
+    const tx = db.transaction('sync-comments', 'readwrite');
+    await tx.objectStore('sync-comments').add(comment);
+    await tx.complete;
+}
+
+async function getCommentsFromIDB() {
+    const db = await openCommentsIDB();
+    const tx = db.transaction('sync-comments', 'readonly');
+    const comments = await tx.objectStore('sync-comments').getAll();
+    await tx.complete;
+    return comments;
+}
