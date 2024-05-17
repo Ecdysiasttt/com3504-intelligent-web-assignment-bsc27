@@ -1,3 +1,6 @@
+/**
+ * Connects plants to MongoDB database when online
+ */
 const mongoose = require('mongoose');
 
 // define the MongoDB connection URL, including
