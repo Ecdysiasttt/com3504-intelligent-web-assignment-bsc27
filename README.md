@@ -70,14 +70,14 @@ http://localhost:3000/
 - routes
 - views
 
-## Library and Packages
+### Library and Packages
 
 - Node.js v22.0.0
 - socket.io v4.5.4
 - Bootstrap v4.5.0
 - Express.js
 
-## Functionality:
+### Functionality:
 
 - Set up an user account
 - User login and logout
