@@ -1,5 +1,5 @@
 /**
- * Connects plants to MongoDB database when online
+ * Connects comments to MongoDB database when online
  */
 const mongoose = require('mongoose');
 
