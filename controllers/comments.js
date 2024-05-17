@@ -1,7 +1,19 @@
+/**
+ * This is the controller for the user commenting system.
+ */
+
+
 // import the plant model
 const commentModel = require('../models/comments');
 
-// function to create new plant
+
+/**
+ * Creates a new comment.
+ * @param chatId unique id of the chat
+ * @param userId unique id of the user
+ * @param text comment contents
+ * @return the new comment as a JSON string
+ */
 exports.create = function (chatId, userId, text) {
     // create a new comment instance using the provided user input, and the post it is attached to (chatId)
     let comment = new commentModel ({

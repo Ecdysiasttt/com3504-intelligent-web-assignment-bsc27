@@ -7,7 +7,6 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 
-//TODO - Add date/time to each comment as well as necessary metadata?
 
 /**
  * Defines the schema for the comment model
@@ -17,11 +16,6 @@ let Schema = mongoose.Schema;
  */
 let CommentSchema = new Schema(
     {
-
-        // chatId           int
-        // userId           int
-        // text             string
-
         // define the fields with correct types
         chatId: {type: Number},
         userId: {type: Number},
