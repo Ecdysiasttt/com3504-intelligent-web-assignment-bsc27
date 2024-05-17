@@ -97,7 +97,9 @@ http://localhost:3000/
 
 ## Design decisions:
 - The user interface uses a simple layout and a white background so that the focus is on the photos of the plants.
-- Users can select the locations of the plants on a map or use their geolocation to allow them add plant details after they leave the site
+- Users can select the locations of the plants on a map or use their geolocation to allow them add plant details after they leave the site.
+- This web application uses MongoDB for online data storage for its flexibility in structured and unstructured data.
+- This web application uses IndexedDB for offline data storage for its ability to store data persistently in the user's browser.
 
 ## Credits:
 <p>Oliver Spacey - ohmspacey1@sheffield.ac.uk</p>
