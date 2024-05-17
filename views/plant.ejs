@@ -177,7 +177,7 @@
                                     <input type="text" id="chat_input" name="chat_input" style="width: 80%">
                                     <button
                                         id="chat_send"
-                                        onclick="connectToRoom('<%= plant.chatId%>'); sendChatText(chat_input, '<%= plant.chatId%>'); addCommentToPlantDB('<%= plant._id%>', chat_input.value); chat_input.value = ''"
+                                        onclick="connectToRoom('<%= plant.chatId%>'); sendChatText(chat_input, '<%= plant.chatId%>'); addCommentToPlantDBIndex('<%= plant._id%>', chat_input.value, '<%= plant.chatId%>'); chat_input.value = ''"
                                         class="btn btn-success btn-sm"
                                     >Send</button>
                                 </p>

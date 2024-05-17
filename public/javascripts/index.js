@@ -376,7 +376,7 @@ function removePlant(id){
 }
 
 
-async function addCommentToPlantDB(plantID, comment) {
+async function addCommentToPlantDBIndex(plantID, comment, chatId) {
 
     console.log('Fetching comment post...', comment)
 
@@ -408,10 +408,13 @@ async function addCommentToPlantDB(plantID, comment) {
         const requestBody = {
             text: comment,
             user: name,
-            plantId: plantID
+            plantId: plantID,
+            chatId: chatId
         };
         console.log('Offline Commenting');
         await addCommentToIDB(requestBody);
+        const newComment = requestBody;
+        writeOnHistory(`<b> ${newComment.user}: </b> ${newComment.text}`, newComment.chatId);
 
     }
 }
@@ -443,21 +446,23 @@ async function loadComments(plantID){
     if(!navigator.onLine){
         //do the same, but have sw respond with cached comments
         //then add getCommentsFromIDB to it
+            try{
+                const db = await openCommentsIDB();
+                const idbComments = await getCommentsFromIDB(db);
+                console.log(idbComments);
+                // const foundComments = await idbComments.find(comment => comment.plantId === plantID);
+                const filteredComments = idbComments.filter(comment => comment.plantId === plantID);
+                const comments = filteredComments // Extract comments from idbComments or use an empty arra// y if not found
+                // const chatId = foundComments.chatId;
 
-        await getCommentsFromIDB()
-            .then(idbComments => {
-                const foundComments = idbComments.result.find(comment => comment.plantId === plantID);
-                const comments = foundComments ? foundComments.result || [] : []; // Extract comments from idbComments or use an empty array if not found
-                const chatId = foundComments ? foundComments.chatId : null;
-
-                let history = document.getElementById('history-' + plantID.toString());
+                // let history = document.getElementById('history-' + plantID.toString());
                 comments.forEach(comment => {
-                    writeOnHistory(`<b> ${comment.userId}: </b> ${comment.text}`, chatId);
+                    writeOnHistory(`<b> ${comment.user}: </b> ${comment.text}`, comment.chatId);
                 });
-            })
-            .catch(error => {
+            }
+            catch(error){
                 console.error('Error fetching comments from IndexedDB:', error);
-            });
+            }
 
         //remove plantId from comments - make them only contain text and userId.
         //const finalComments = ...

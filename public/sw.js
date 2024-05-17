@@ -1,5 +1,6 @@
 importScripts('/javascripts/idb-utility.js');
 importScripts('/javascripts/insert.js');
+// importScripts('/javascripts/index.js');
 
 const staticAssets = [
     "/",
@@ -105,7 +106,6 @@ self.addEventListener('fetch', event => {
             return networkResponse;
         }
 
-
         if (navigator.onLine && event.request.url.endsWith('/plants/add') && event.request.method === 'GET') {
             console.log('Add plant to mongoDB');
             const networkResponse = await fetch(event.request);
@@ -120,8 +120,13 @@ self.addEventListener('fetch', event => {
 
         if (navigator.onLine && event.request.url.endsWith('/comments') && event.request.method === 'GET') {
             console.log('Getting Comments ONLINE');
-            const networkResponse = await fetch(event.request);
-            return networkResponse;
+            try {
+                const networkResponse = await fetch(event.request);
+                await cache.put(event.request, networkResponse.clone()); // Recache the comments page with updated data.
+                return networkResponse;
+            } catch{
+                return cachedResponse;
+            }
         }
 
         if (!navigator.onLine && event.request.url.endsWith('/comments') && event.request.method === "GET") {
@@ -141,9 +146,6 @@ self.addEventListener('fetch', event => {
 
         if (!(navigator.onLine) && event.request.url.endsWith('/plants/add') && event.request.method === "GET") {
             console.log('Adding plant to iDB');
-            //Get network data from this request
-            //Add data to plantsiDB
-            //redirect to homepage?
             return await cache.match(event.request);
         }
 
@@ -197,6 +199,8 @@ async function syncData() {
     try {
         const db = await openSyncPlantsIDB();
         const syncPlants = await getAllSyncPlants(db);
+        const commentDb = await openCommentsIDB();
+        const comments = await getCommentsFromIDB(commentDb);
 
         for (const plant of syncPlants) {
             try {
@@ -219,6 +223,28 @@ async function syncData() {
                 console.log(`Plant synchronized and deleted from IDB: ${plant.id}`);
             } catch (fetchError) {
                 console.error(`Failed to sync plant ${plant.id}:`, fetchError);
+            }
+        }
+
+        //For each comment in comments, add to the plant.comments with the matching plant._id === comment.plantId
+        //        const requestBody = {
+        //             text: comment,
+        //             user: name,
+        //             plantId: plantID,
+        //             chatId: chatId
+        //         };
+
+        for (const comment of comments) {
+            try {
+                const plantID = comment.plantId;
+                const commentText = comment.text;
+                const chatId = comment.chatId;
+                const name = comment.user;
+                await addCommentToPlantDB(plantID, commentText, chatId, name);
+
+                await deleteCommentFromIDB(commentDb, comment.id);
+            }catch (fetcherror){
+                console.error(`Failed to sync comment ${comment.commentText}:`, fetcherror);
             }
         }
 

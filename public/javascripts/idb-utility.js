@@ -229,10 +229,78 @@ async function addCommentToIDB(comment) {
     await tx.complete;
 }
 
-async function getCommentsFromIDB() {
-    const db = await openCommentsIDB();
-    const tx = db.transaction('sync-comments', 'readonly');
-    const comments = await tx.objectStore('sync-comments').getAll();
-    await tx.complete;
-    return comments;
+
+const getCommentsFromIDB = (commentsIDB) => {
+
+    return new Promise((resolve, reject) => {
+        const transaction = commentsIDB.transaction(["sync-comments"]);
+        const plantStore = transaction.objectStore("sync-comments");
+        const getAllRequest = plantStore.getAll();
+
+        getAllRequest.addEventListener("success", () => {
+            console.log('Got all to-sync plants');
+            resolve(getAllRequest.result);
+        });
+
+        getAllRequest.addEventListener("error", (event) => {
+            reject(event.target.error);
+        });
+    });
+};
+
+const deleteCommentFromIDB = (commentIDB, id) => {
+    const transaction = commentIDB.transaction(["sync-comments"], "readwrite");
+    const plantStore = transaction.objectStore("sync-comments");
+    const deleteRequest = plantStore.delete(id);
+
+    deleteRequest.addEventListener("success", () => {
+        console.log("Deleted " + id);
+    });
+
+    deleteRequest.addEventListener("error", (event) => {
+        console.error("Error deleting sync comment from IDB:", event.target.error);
+    });
+};
+
+async function addCommentToPlantDB(plantID, comment, chatId, name) {
+
+    console.log('Fetching comment post...', comment)
+
+
+    if (navigator.onLine) {
+        console.log('Online commenting');
+        const requestBody = {
+            text: comment,
+            user: name
+        };
+
+        fetch(`/plants/${plantID}/comments`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+
+        }).then(response => {
+            if (response.ok) {
+                console.log('Got plant');
+            } else {
+                console.log('Could not fetch post for comment');
+            }
+        }).catch(error => {
+            console.log('Error fetching post for comment:', error);
+        });
+    } else {
+        const requestBody = {
+            text: comment,
+            user: name,
+            plantId: plantID,
+            chatId: chatId
+        };
+        console.log('Offline Commenting');
+        await addCommentToIDB(requestBody);
+        const newComment = requestBody;
+        writeOnHistory(`<b> ${newComment.user}: </b> ${newComment.text}`, newComment.chatId);
+
+    }
 }
